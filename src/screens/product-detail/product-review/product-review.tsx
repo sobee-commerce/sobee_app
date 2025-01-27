@@ -53,26 +53,32 @@ const ProductReviewScreen = ({
 
   return (
     <View style={{flex: 1}}>
-      <FlatList
-        ListEmptyComponent={() => (
-          <Text
-            style={{
-              ...TYPOGRAPHY.body1,
-              color: colors.layout.foreground,
-              textAlign: 'center',
-            }}>
-            No questions yet
-          </Text>
-        )}
-        showsVerticalScrollIndicator={false}
-        data={reviews}
-        contentContainerStyle={{gap: 12, padding: 20}}
-        keyExtractor={item => item._id!}
-        renderItem={({item}) => <ReviewCard review={item} />}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={1}
-        ListFooterComponent={() => isFetchingNextPage && <ActivityIndicator />}
-      />
+      {isLoading ? (
+        <ActivityIndicator />
+      ) : (
+        <FlatList
+          ListEmptyComponent={() => (
+            <Text
+              style={{
+                ...TYPOGRAPHY.body1,
+                color: colors.layout.foreground,
+                textAlign: 'center',
+              }}>
+              No questions yet
+            </Text>
+          )}
+          showsVerticalScrollIndicator={false}
+          data={reviews}
+          contentContainerStyle={{gap: 12, padding: 20}}
+          keyExtractor={item => item._id!}
+          renderItem={({item}) => <ReviewCard review={item} />}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={1}
+          ListFooterComponent={() =>
+            isFetchingNextPage && <ActivityIndicator />
+          }
+        />
+      )}
     </View>
   );
 };

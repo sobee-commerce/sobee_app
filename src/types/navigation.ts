@@ -35,13 +35,14 @@ export type ApplicationStackParamList = {
   Contact: {roomId: string};
   Refund: {orderId: string};
   Review: {orderId: string; data?: IReview};
-  Voucher: undefined;
-  VoucherDetail: {voucherId: string};
+  Coupon: undefined;
+  CouponDetail: {couponId: string};
   ProductDetail: {productId: string; name: string};
   ProductReview: {productId: string};
   ProductQuestion: {productId: string};
   AskQuestion: {productId: string; data?: IQuestion};
   Favorite: undefined;
+  ScanQRCode?: {onSuccess?: (data: string) => void};
 };
 
 /**

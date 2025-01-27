@@ -1,7 +1,7 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import {useTheme} from '@/context';
+import {CameraProvider, useTheme} from '@/context';
 import {
   AddressDetailScreen,
   AddressScreen,
@@ -13,6 +13,7 @@ import {
   CategoryScreen,
   ChatScreen,
   CheckoutScreen,
+  CouponDetailScreen,
   FavoriteScreen,
   LoginScreen,
   MainScreen,
@@ -25,6 +26,7 @@ import {
   ProductQuestionScreen,
   ProductReviewScreen,
   RegisterScreen,
+  ScanQRScreen,
   ShippingAddressScreen,
   SplashScreen,
 } from '@/screens';
@@ -38,6 +40,14 @@ const Stack = createStackNavigator<ApplicationStackParamList>();
 function ApplicationNavigator() {
   const initialRouteName: keyof ApplicationStackParamList = 'Splash';
   const {colors, theme} = useTheme();
+
+  const QRScanner = (props: any) => {
+    return (
+      <CameraProvider>
+        <ScanQRScreen {...props} />
+      </CameraProvider>
+    );
+  };
 
   return (
     <>
@@ -53,6 +63,24 @@ function ApplicationNavigator() {
             notification: colors.base.danger,
           },
           dark: theme === 'dark',
+          fonts: {
+            bold: {
+              fontFamily: FONT_FAMILY.bold,
+              fontWeight: 'bold',
+            },
+            medium: {
+              fontFamily: FONT_FAMILY.medium,
+              fontWeight: '500',
+            },
+            regular: {
+              fontFamily: FONT_FAMILY.regular,
+              fontWeight: '400',
+            },
+            heavy: {
+              fontFamily: FONT_FAMILY.extraBold,
+              fontWeight: '800',
+            },
+          },
         }}>
         <Stack.Navigator
           screenOptions={{
@@ -106,6 +134,7 @@ function ApplicationNavigator() {
           <Stack.Screen name="Favorite" component={FavoriteScreen} />
           <Stack.Screen name="Brand" component={BrandScreen} />
           <Stack.Screen name="BrandDetail" component={BrandDetailScreen} />
+          <Stack.Screen name="CouponDetail" component={CouponDetailScreen} />
           <Stack.Screen name="Category" component={CategoryScreen} />
           <Stack.Screen
             name="CategoryDetail"
@@ -117,6 +146,7 @@ function ApplicationNavigator() {
           <Stack.Screen name="Contact" component={OrderContactScreen} />
           <Stack.Screen name="Refund" component={OrderRefundScreen} />
           <Stack.Screen name="Review" component={OrderReviewScreen} />
+          <Stack.Screen name="ScanQRCode" component={QRScanner} />
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar

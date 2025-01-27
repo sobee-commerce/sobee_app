@@ -8,6 +8,8 @@ export {default as CategoryDetailScreen} from './category/category-detail/catego
 export {default as ChatScreen} from './chat/chat';
 export {default as CheckoutScreen} from './checkout/checkout';
 export {default as ShippingAddressScreen} from './checkout/shipping-address';
+export {default as CouponScreen} from './coupon/coupon';
+export {default as CouponDetailScreen} from './coupon/coupon-detail/coupon-detail';
 export {default as FavoriteScreen} from './favorite/favorite';
 export {default as HomeScreen} from './home/home';
 export {default as MainScreen} from './main/main';
@@ -16,6 +18,7 @@ export {default as ProductDetailScreen} from './product-detail/product-detail';
 export {default as AskQuestionScreen} from './product-detail/product-question/ask-question';
 export {default as ProductQuestionScreen} from './product-detail/product-question/product-question';
 export {default as ProductReviewScreen} from './product-detail/product-review/product-review';
+export {default as ScanQRScreen} from './qr-scanner/qr-scanner';
 export {default as SearchScreen} from './search/search';
 export {default as SettingScreen} from './settings/settings';
 export {default as SplashScreen} from './splash/splash';

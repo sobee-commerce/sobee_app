@@ -10,26 +10,42 @@ import {useCreateReviewMutation, useEditReviewMutation} from '@/services';
 import {TYPOGRAPHY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
 import {zodResolver} from '@hookform/resolvers/zod';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {ScrollView, Text} from 'react-native';
+import {Rating} from 'react-native-ratings';
 
 const ReviewOrderScreen = ({
   navigation,
   route,
 }: ApplicationScreenProps<'Review'>) => {
   const {colors} = useTheme();
-  const {orderId, data} = route.params;
-  const isEdit = !!data;
+  const {orderId, data: orderData} = route.params;
+  const isEdit = !!orderData;
   const {
     formState: {errors},
     handleSubmit,
     control,
+    watch,
+    reset,
   } = useForm<CreateReviewForm | EditReviewForm>({
     resolver: zodResolver(
       isEdit ? editReviewFormSchema : createReviewFormSchema,
     ),
+    defaultValues: {
+      product: orderId,
+    },
   });
+
+  const {rating} = watch();
+
+  useEffect(() => {
+    if (orderData) {
+      reset({
+        ...orderData,
+      });
+    }
+  }, [orderData]);
 
   const createReviewMutation = useCreateReviewMutation();
   const editReviewMutation = useEditReviewMutation();
@@ -43,6 +59,36 @@ const ReviewOrderScreen = ({
     });
   }, []);
 
+  const submit = handleSubmit(data => {
+    if (isEdit) {
+      editReviewMutation.mutate(
+        {
+          content: data.content,
+          rating: data.rating,
+          _id: orderData._id!,
+        },
+        {
+          onSuccess: () => {
+            navigation.goBack();
+          },
+        },
+      );
+    } else {
+      createReviewMutation.mutate(
+        {
+          content: data.content,
+          rating: data.rating,
+          product: orderId,
+        },
+        {
+          onSuccess: () => {
+            navigation.goBack();
+          },
+        },
+      );
+    }
+  });
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -51,23 +97,44 @@ const ReviewOrderScreen = ({
       }}>
       <Controller
         control={control}
+        name="rating"
+        render={({field: {onChange}}) => (
+          <Rating
+            onFinishRating={onChange}
+            ratingCount={5}
+            startingValue={rating || 5}
+            fractions={0}
+            showRating
+          />
+        )}
+      />
+
+      <Controller
+        control={control}
         name="content"
         render={({field: {onChange, value}}) => (
           <TextArea
             onChangeText={onChange}
             value={value}
-            label="Title"
-            placeholder="Enter title"
+            label="Review"
+            placeholder="Enter review"
             radius="sm"
             size="sm"
             isInvalid={!!errors.content}
             errorMessage={errors.content?.message}
             isDisabled={isPending}
+            style={{
+              minHeight: 100,
+            }}
           />
         )}
       />
 
-      <Button color="primary">
+      <Button
+        color="primary"
+        onPress={submit}
+        isLoading={isPending}
+        isDisabled={isPending}>
         <Text
           style={[
             TYPOGRAPHY.button,

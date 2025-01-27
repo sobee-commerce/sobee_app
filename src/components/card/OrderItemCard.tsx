@@ -7,9 +7,9 @@ import {
 } from '@/services';
 import {FONT_FAMILY} from '@/theme';
 import {ApplicationNavigationProps} from '@/types';
+import {optimizeImageSrc} from '@/utils/image';
 import {useNavigation} from '@react-navigation/native';
 import {Minus, Plus, Trash2} from 'lucide-react-native';
-import React from 'react';
 import {Alert, Image, Pressable, Text, ToastAndroid, View} from 'react-native';
 import {Button} from '../common';
 
@@ -27,13 +27,13 @@ const OrderItemCard = ({
   const product = orderItem.product as IProduct;
   const {colors} = useTheme();
   const navigation = useNavigation<ApplicationNavigationProps>();
-
   const changeOrderItemQuantity = useUpdateOrderItemQuantityMutation();
   const removeOrderItemMutation = useRemoveOrderItemMutation();
 
   const onChangeOrderItemQuantity = (quantity: number) => {
     if (quantity < 1) return;
     if (quantity > product.quantity) return;
+    ToastAndroid.show('Updating quantity...', ToastAndroid.SHORT);
     changeOrderItemQuantity.mutate(
       {
         _id: orderItem._id!,
@@ -93,18 +93,26 @@ const OrderItemCard = ({
         flexDirection: 'row',
         gap: 12,
       }}>
-      <Image
-        source={{uri: product.thumbnail}}
-        style={{
-          width: 60,
-          height: 60,
-          backgroundColor: 'white',
-          borderRadius: 8,
-          borderWidth: 2,
-          borderColor: colors.default.default200,
-        }}
-        resizeMode="contain"
-      />
+      <Pressable
+        onPress={() => {
+          navigation.navigate('ProductDetail', {
+            productId: product._id!,
+            name: product.name,
+          });
+        }}>
+        <Image
+          source={{uri: optimizeImageSrc(product.thumbnail, 60, 60)}}
+          style={{
+            width: 60,
+            height: 60,
+            backgroundColor: 'white',
+            borderRadius: 8,
+            borderWidth: 2,
+            borderColor: colors.default.default200,
+          }}
+          resizeMode="contain"
+        />
+      </Pressable>
       <View
         style={{
           flex: 1,

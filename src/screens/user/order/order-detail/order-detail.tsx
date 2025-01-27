@@ -12,7 +12,7 @@ import {
 } from '@/services';
 import {FONT_FAMILY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
-import React, {useEffect, useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -100,6 +100,15 @@ const OrderDetailScreen = ({
     // });
   };
 
+  const onReceiveOrder = () => {
+    navigation.navigate('ScanQRCode', {
+      onSuccess: (value: string) => {
+        console.log(value);
+        // TODO: Call API to update order status
+      },
+    });
+  };
+
   const shippingAddress = (order.shippingAddress || {}) as IAddress;
 
   const addressString = useMemo(() => {
@@ -126,14 +135,15 @@ const OrderDetailScreen = ({
             onPress={onPressCancel}
             style={{
               marginRight: 16,
-            }}>
+            }}
+            disabled={cancelOrderMutation.isPending}>
             <Text
               style={{
                 color: tintColor,
                 fontFamily: FONT_FAMILY.medium,
                 fontSize: 14,
               }}>
-              Cancel
+              {cancelOrderMutation.isPending ? 'Cancelling...' : 'Cancel'}
             </Text>
           </Pressable>
         ) : null,
@@ -178,7 +188,11 @@ const OrderDetailScreen = ({
           data={orderItems}
           keyExtractor={item => item._id!}
           renderItem={({item}) => (
-            <OrderItemCard orderItem={item} hideActions />
+            <OrderItemCard
+              orderItem={item}
+              hideActions
+              canReview={order.status === EOrderStatus.COMPLETED}
+            />
           )}
         />
       </ScrollView>
@@ -287,6 +301,22 @@ const OrderDetailScreen = ({
             Chat with seller
           </Text>
         </Button>
+        {order.status === EOrderStatus.DELIVERED && (
+          <Button
+            isLoading={isLoading}
+            isDisabled={isLoading}
+            color="success"
+            style={{marginTop: 16}}
+            onPress={onReceiveOrder}>
+            <Text
+              style={{
+                fontFamily: FONT_FAMILY.medium,
+                color: colors.white,
+              }}>
+              Receive Order
+            </Text>
+          </Button>
+        )}
       </View>
     </View>
   );

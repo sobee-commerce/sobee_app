@@ -7,7 +7,7 @@ import {useGetOrderItemsQuery} from '@/services';
 import {FONT_FAMILY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
 import {ChevronsDown, ChevronsUp} from 'lucide-react-native';
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,

@@ -12,10 +12,10 @@ import {
   useGetPopularProductsQuery,
 } from '@/services';
 import {ApplicationScreenProps} from '@/types';
-import {APP_CONFIG} from '@/utils';
+import {APP_CONFIG, TYPOGRAPHY} from '@/utils';
 import {useInfiniteQuery} from '@tanstack/react-query';
-import React, {useMemo} from 'react';
-import {ActivityIndicator, FlatList, StatusBar, View} from 'react-native';
+import {useMemo} from 'react';
+import {ActivityIndicator, FlatList, StatusBar, Text, View} from 'react-native';
 
 const HomeScreen = ({navigation}: ApplicationScreenProps<'Home'>) => {
   const {colors} = useTheme();
@@ -93,6 +93,71 @@ const HomeScreen = ({navigation}: ApplicationScreenProps<'Home'>) => {
     }
   };
 
+  const renderHeader = () => {
+    return (
+      <View style={{gap: 20}}>
+        <LabelItemList
+          isLoading={categoriesQuery.isLoading}
+          isError={categoriesQuery.isError}
+          label="Categories"
+          showNavigation
+          onPressNavigation={() => navigation.navigate('Category')}
+          data={categories}
+          renderItem={({item}) => <CategoryCard category={item} />}
+          listProps={{
+            horizontal: true,
+            removeClippedSubviews: true,
+          }}
+        />
+        <LabelItemList
+          isLoading={brandsQuery.isLoading}
+          isError={brandsQuery.isError}
+          label="Brands"
+          showNavigation
+          onPressNavigation={() => navigation.navigate('Brand')}
+          data={brands}
+          renderItem={({item}) => <BrandCard brand={item} />}
+          listProps={{
+            horizontal: true,
+            removeClippedSubviews: true,
+          }}
+        />
+        {products.map(({label, isLoading: _isLoading, data: _data}) => (
+          <LabelItemList
+            key={label}
+            isLoading={_isLoading}
+            data={_data}
+            label={label}
+            renderItem={({item}) => (
+              <ProductCard
+                product={item}
+                style={{
+                  width: APP_CONFIG.SCREEN.WIDTH / 2 - 26,
+                }}
+              />
+            )}
+            listProps={{
+              numColumns: 2,
+              scrollEnabled: false,
+              columnWrapperStyle: {gap: 12},
+              contentContainerStyle: {gap: 12},
+              style: {gap: 12},
+            }}
+          />
+        ))}
+        <Text
+          style={[
+            TYPOGRAPHY.h6,
+            {
+              color: colors.layout.foreground,
+            },
+          ]}>
+          All Products
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <View style={{flex: 1}}>
       <FlatList
@@ -113,62 +178,9 @@ const HomeScreen = ({navigation}: ApplicationScreenProps<'Home'>) => {
         numColumns={2}
         columnWrapperStyle={{gap: 12}}
         initialNumToRender={10}
-        windowSize={10}
         removeClippedSubviews
         ListFooterComponent={() => isFetchingNextPage && <ActivityIndicator />}
-        ListHeaderComponent={() => (
-          <View style={{gap: 20}}>
-            <LabelItemList
-              isLoading={categoriesQuery.isLoading}
-              isError={categoriesQuery.isError}
-              label="Categories"
-              showNavigation
-              onPressNavigation={() => navigation.navigate('Category')}
-              data={categories}
-              renderItem={({item}) => <CategoryCard category={item} />}
-              listProps={{
-                horizontal: true,
-              }}
-            />
-            <LabelItemList
-              isLoading={brandsQuery.isLoading}
-              isError={brandsQuery.isError}
-              label="Brands"
-              showNavigation
-              onPressNavigation={() => navigation.navigate('Brand')}
-              data={brands}
-              renderItem={({item}) => <BrandCard brand={item} />}
-              listProps={{
-                horizontal: true,
-              }}
-            />
-            {products.map(({label, isLoading, data}) =>
-              data.length > 0 ? (
-                <LabelItemList
-                  key={label}
-                  isLoading={isLoading}
-                  data={data}
-                  label={label}
-                  renderItem={({item}) => (
-                    <ProductCard
-                      product={item}
-                      style={{
-                        width: APP_CONFIG.SCREEN.WIDTH / 2 - 26,
-                      }}
-                    />
-                  )}
-                  listProps={{
-                    numColumns: 2,
-                    scrollEnabled: false,
-                    columnWrapperStyle: {gap: 12},
-                    contentContainerStyle: {gap: 12},
-                    style: {gap: 12},
-                  }}
-                />
-              ) : null,
-            )}
-          </View>
-        )}
+        ListHeaderComponent={renderHeader}
       />
       <StatusBar backgroundColor={colors.base.primary} />
     </View>

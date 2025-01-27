@@ -4,7 +4,7 @@ import {TYPOGRAPHY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
 import {APP_CONFIG, STORAGE} from '@/utils';
 import React from 'react';
-import {Image, Text, View} from 'react-native';
+import {Image, StatusBar, Text, View} from 'react-native';
 
 const OnboardingScreen = ({
   navigation,
@@ -96,6 +96,7 @@ const OnboardingScreen = ({
           </Text>
         </Button>
       </View>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" />
     </View>
   );
 };

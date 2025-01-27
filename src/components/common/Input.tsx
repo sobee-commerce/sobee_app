@@ -3,9 +3,8 @@ import {TYPOGRAPHY} from '@/theme';
 import {radiusConfig, sizeConfig} from '@/theme/theme-config';
 import {ThemeRadius, ThemeSize} from '@/types';
 import {Eye, EyeOff} from 'lucide-react-native';
-import React, {forwardRef, useState} from 'react';
+import {forwardRef, useState} from 'react';
 import {
-  Keyboard,
   Pressable,
   StyleProp,
   StyleSheet,
@@ -15,7 +14,6 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import {useClickOutside} from 'react-native-click-outside';
 
 export type InputProps = {
   isDisabled?: boolean;
@@ -50,14 +48,9 @@ const Input = forwardRef<TextInput, InputProps>(
     const {colors} = useTheme();
     const [isFocused, setIsFocused] = useState(false);
     const [isSecure, setIsSecure] = useState(props.secureTextEntry || false);
-    const outsideRef = useClickOutside<View>(() => {
-      setIsFocused(false);
-      Keyboard.dismiss();
-    });
 
     return (
       <View
-        ref={outsideRef}
         style={StyleSheet.flatten([
           {
             gap: 8,
@@ -100,11 +93,11 @@ const Input = forwardRef<TextInput, InputProps>(
               style={StyleSheet.flatten([
                 {
                   flex: 1,
-
                   color: isInvalid
                     ? colors.base.danger
                     : colors.layout.foreground,
                 },
+                props.style,
                 TYPOGRAPHY.body2,
                 sizeConfig(size),
               ])}

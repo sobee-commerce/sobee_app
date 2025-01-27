@@ -389,6 +389,8 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
         <Button
           color="primary"
           style={{marginTop: 16}}
+          isLoading={createOrderMutation.isPending}
+          isDisabled={createOrderMutation.isPending}
           onPress={handleSubmit(onPressCheckout)}>
           <Text
             style={{

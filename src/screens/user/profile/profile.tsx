@@ -4,8 +4,8 @@ import {useTheme} from '@/context';
 import {useGetMeQuery, useLogoutMutation} from '@/services';
 import {ApplicationScreenProps} from '@/types';
 import {APP_CONFIG, STORAGE, TYPOGRAPHY} from '@/utils';
+import {useQueryClient} from '@tanstack/react-query';
 import {LogOut, Moon, PencilLine, Sun} from 'lucide-react-native';
-import React from 'react';
 import {
   Image,
   ScrollView,
@@ -23,6 +23,7 @@ const ProfileScreen = ({navigation}: ApplicationScreenProps<'Profile'>) => {
   const {isPending, mutate} = useLogoutMutation();
   const {data} = useGetMeQuery();
   const user = data?.data.user;
+  const queryClient = useQueryClient();
 
   const onPressLogout = () => {
     mutate(undefined, {
@@ -35,6 +36,7 @@ const ProfileScreen = ({navigation}: ApplicationScreenProps<'Profile'>) => {
           index: 0,
           routes: [{name: 'Login'}],
         });
+        queryClient.clear();
       },
       onError: (error: any) => {
         ToastAndroid.show(

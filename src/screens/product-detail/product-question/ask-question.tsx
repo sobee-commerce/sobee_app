@@ -7,7 +7,7 @@ import {
 } from '@/services';
 import {TYPOGRAPHY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Alert, Pressable, ScrollView, Text} from 'react-native';
 
 const AskQuestionScreen = ({
@@ -81,8 +81,6 @@ const AskQuestionScreen = ({
         ) : null,
     });
   }, [data]);
-
-  console.log(data);
 
   const [question, setQuestion] = useState(data?.content || '');
   const createQuestionMutation = useCreateQuestionMutation();

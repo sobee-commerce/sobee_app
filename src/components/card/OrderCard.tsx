@@ -48,6 +48,7 @@ const OrderCard = ({order}: Props) => {
                 borderRadius: itemLength > 1 ? 20 : 0,
                 position: itemLength > 1 ? 'absolute' : 'relative',
                 left: itemLength > 1 ? (index + 1) * 12 : 0,
+                borderWidth: itemLength > 1 ? 0.2 : 0,
               }}
               resizeMode="contain"
             />

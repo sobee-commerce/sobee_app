@@ -2,8 +2,8 @@ import {useTheme} from '@/context';
 import {IBrand} from '@/lib/interfaces';
 import {TYPOGRAPHY} from '@/theme';
 import {ApplicationNavigationProps} from '@/types';
+import {optimizeImageSrc} from '@/utils/image';
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
 import {Image, Pressable, Text} from 'react-native';
 
 type BrandCardProps = {
@@ -26,9 +26,10 @@ const BrandCard = ({brand}: BrandCardProps) => {
         borderColor: colors.default.default200,
         borderRadius: 8,
         gap: 8,
+        width: 100,
       }}>
       <Image
-        source={{uri: brand.logo!}}
+        source={{uri: optimizeImageSrc(brand.logo!, 60, 60)}}
         style={{
           width: 60,
           height: 60,
@@ -38,11 +39,13 @@ const BrandCard = ({brand}: BrandCardProps) => {
         resizeMode="cover"
       />
       <Text
+        numberOfLines={1}
         style={[
           TYPOGRAPHY.body2,
           {
             color: colors.layout.foreground,
             textAlign: 'center',
+            fontSize: 12,
           },
         ]}>
         {brand.name}

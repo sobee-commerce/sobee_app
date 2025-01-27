@@ -98,6 +98,7 @@ const LabelItemList = <T = any,>({
                 TYPOGRAPHY.body1,
                 {
                   color: colors.layout.foreground,
+                  fontSize: 14,
                 },
               ]}>
               {isError ? 'An error occurred' : 'No items found'}

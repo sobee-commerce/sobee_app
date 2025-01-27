@@ -152,7 +152,7 @@ const ProductDetailScreen = ({
     return discountPrice?.map(v => formatCurrency(v * quantity)).join(' - ');
   }, [discountPrice, quantity]);
 
-  const renderPrice = useCallback(() => {
+  const renderPrice = useMemo(() => {
     return (
       product?.type === 'SIMPLE'
         ? [product?.displayPrice]
@@ -272,6 +272,7 @@ const ProductDetailScreen = ({
                 borderWidth: 4,
                 borderColor: colors.default.default100,
               }}
+              resizeMode="contain"
             />
             <Text
               style={{
@@ -291,7 +292,7 @@ const ProductDetailScreen = ({
               textDecorationColor: colors.default.default400,
               textDecorationLine: product.isDiscount ? 'line-through' : 'none',
             }}>
-            {renderPrice()}
+            {renderPrice}
           </Text>
           {product.isDiscount && (
             <Text
@@ -412,11 +413,11 @@ const ProductDetailScreen = ({
             borderTopColor: colors.layout.divider,
             zIndex: 100,
             backgroundColor: colors.layout.background,
+            gap: 16,
           }}>
           {product?.type === 'VARIABLE' && (
             <View
               style={{
-                marginBottom: 16,
                 gap: 8,
               }}>
               {optimizedData.map((variant, index) => (
@@ -481,7 +482,6 @@ const ProductDetailScreen = ({
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: 16,
             }}>
             <Text
               style={{
@@ -536,14 +536,17 @@ const ProductDetailScreen = ({
               </Pressable>
             </View>
           </View>
+
           <Button
             color="primary"
             onPress={() => {
               onPressAddToCart();
             }}
+            isLoading={addToCartMutation.isPending}
             isDisabled={
-              product.type === 'VARIABLE' &&
-              (!selectedVariant.size || !selectedVariant.color)
+              (product.type === 'VARIABLE' &&
+                (!selectedVariant.size || !selectedVariant.color)) ||
+              addToCartMutation.isPending
             }>
             <Text
               style={{

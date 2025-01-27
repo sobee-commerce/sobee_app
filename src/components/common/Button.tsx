@@ -65,7 +65,7 @@ const Button = forwardRef<View, ButtonProps>(
             }}
           />
         )}
-        {isLoading && <ActivityIndicator size={'small'} />}
+
         <View
           style={StyleSheet.flatten([
             {
@@ -78,7 +78,15 @@ const Button = forwardRef<View, ButtonProps>(
             props.innerStyle,
           ])}>
           {startContent || <View style={{width: 20, height: 20}} />}
-          <View style={{flex: 1, alignItems: 'center'}}>
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'row',
+              gap: 4,
+            }}>
+            {isLoading && <ActivityIndicator size={'small'} />}
             {children as React.ReactNode}
           </View>
           {endContent || <View style={{width: 20, height: 20}} />}

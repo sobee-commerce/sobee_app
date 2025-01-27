@@ -48,6 +48,7 @@ const OrderScreen = ({navigation, route}: ApplicationScreenProps<'Order'>) => {
         horizontal
         contentContainerStyle={{paddingBottom: 10}}
         bounces={false}
+        showsHorizontalScrollIndicator={false}
         alwaysBounceHorizontal={false}
         bouncesZoom={false}
         renderItem={({item}) => (
@@ -78,28 +79,34 @@ const OrderScreen = ({navigation, route}: ApplicationScreenProps<'Order'>) => {
           </Pressable>
         )}
       />
-      <FlatList
-        bounces={false}
-        ListEmptyComponent={() => (
-          <Text
-            style={{
-              ...TYPOGRAPHY.body1,
-              color: colors.layout.foreground,
-              textAlign: 'center',
-            }}>
-            No orders yet
-          </Text>
-        )}
-        data={flatData}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{gap: 12, padding: 20, paddingTop: 0}}
-        keyExtractor={item => item._id!}
-        renderItem={({item}) => <OrderCard order={item} />}
-        onEndReachedThreshold={1}
-        onEndReached={onEndReached}
-        removeClippedSubviews
-        ListFooterComponent={() => isFetchingNextPage && <ActivityIndicator />}
-      />
+      {isLoading ? (
+        <ActivityIndicator />
+      ) : (
+        <FlatList
+          bounces={false}
+          ListEmptyComponent={() => (
+            <Text
+              style={{
+                ...TYPOGRAPHY.body1,
+                color: colors.layout.foreground,
+                textAlign: 'center',
+              }}>
+              No orders yet
+            </Text>
+          )}
+          data={flatData}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{gap: 12, padding: 20, paddingTop: 0}}
+          keyExtractor={item => item._id!}
+          renderItem={({item}) => <OrderCard order={item} />}
+          onEndReachedThreshold={1}
+          onEndReached={onEndReached}
+          removeClippedSubviews
+          ListFooterComponent={() =>
+            isFetchingNextPage && <ActivityIndicator />
+          }
+        />
+      )}
     </View>
   );
 };

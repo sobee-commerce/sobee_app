@@ -1,6 +1,19 @@
-import {HomeScreen, OrderScreen, ProfileScreen, SearchScreen} from '@/screens';
+import {
+  CouponScreen,
+  HomeScreen,
+  OrderScreen,
+  ProfileScreen,
+  SearchScreen,
+} from '@/screens';
 import {ApplicationStackParamList} from '@/types';
-import {Box, Compass, LucideIcon, Search, UserRound} from 'lucide-react-native';
+import {
+  Box,
+  Compass,
+  LucideIcon,
+  Search,
+  TicketPercent,
+  UserRound,
+} from 'lucide-react-native';
 type BottomTab = {
   key: keyof ApplicationStackParamList;
   title: string;
@@ -14,6 +27,12 @@ export const bottomTabsMock: BottomTab[] = [
     title: 'Explore',
     icon: Compass,
     component: HomeScreen,
+  },
+  {
+    key: 'Coupon',
+    title: 'Coupon',
+    icon: TicketPercent,
+    component: CouponScreen,
   },
   {
     key: 'Search',

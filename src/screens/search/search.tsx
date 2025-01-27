@@ -5,7 +5,7 @@ import {productService} from '@/services';
 import {TYPOGRAPHY} from '@/theme';
 import {APP_CONFIG} from '@/utils';
 import {useInfiniteQuery} from '@tanstack/react-query';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -41,6 +41,7 @@ const SearchScreen = () => {
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.hasNext ? allPages.length + 1 : undefined;
     },
+    enabled: value !== '',
   });
 
   const flatData = data?.pages.flatMap(page => page.data);
@@ -69,55 +70,54 @@ const SearchScreen = () => {
             borderWidth: 1,
             borderRadius: 8,
             paddingHorizontal: 12,
+            marginBottom: 8,
             ...TYPOGRAPHY.body2,
           }}
           placeholder="Clothing, Shoes, Watches, etc."
           value={keyword}
           onChangeText={setKeyword}
         />
-        <Text
-          style={{
-            ...TYPOGRAPHY.body2,
-            color: colors.layout.foreground,
-          }}>
-          Enter your search query here
-        </Text>
       </View>
 
-      {isLoading && <ActivityIndicator size={'large'} />}
-      <FlatList
-        data={flatData}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{gap: 12, padding: 20}}
-        keyExtractor={item => item._id!}
-        ListEmptyComponent={() => (
-          <Text
-            style={[
-              TYPOGRAPHY.body1,
-              {
-                color: colors.layout.foreground,
-              },
-            ]}>
-            {isFetching ? 'Searching...' : 'No items found'}
-          </Text>
-        )}
-        renderItem={({item}) => (
-          <ProductCard
-            product={item}
-            style={{
-              width: APP_CONFIG.SCREEN.WIDTH / 2 - 26,
-            }}
-          />
-        )}
-        onEndReachedThreshold={1}
-        onEndReached={onEndReached}
-        numColumns={2}
-        columnWrapperStyle={{gap: 12}}
-        initialNumToRender={10}
-        windowSize={10}
-        removeClippedSubviews
-        ListFooterComponent={() => isFetchingNextPage && <ActivityIndicator />}
-      />
+      {isLoading && <ActivityIndicator />}
+      {value !== '' && (
+        <FlatList
+          data={flatData}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{gap: 12, padding: 20, paddingBottom: 100}}
+          keyExtractor={item => item._id!}
+          ListEmptyComponent={() => (
+            <Text
+              style={[
+                TYPOGRAPHY.body1,
+                {
+                  color: colors.layout.foreground,
+                  fontSize: 14,
+                },
+              ]}>
+              {isFetching ? 'Searching...' : 'No items found'}
+            </Text>
+          )}
+          renderItem={({item}) => (
+            <ProductCard
+              product={item}
+              style={{
+                width: APP_CONFIG.SCREEN.WIDTH / 2 - 26,
+              }}
+            />
+          )}
+          onEndReachedThreshold={1}
+          onEndReached={onEndReached}
+          numColumns={2}
+          columnWrapperStyle={{gap: 12}}
+          initialNumToRender={10}
+          windowSize={10}
+          removeClippedSubviews
+          ListFooterComponent={() =>
+            isFetchingNextPage && <ActivityIndicator />
+          }
+        />
+      )}
       <StatusBar backgroundColor={colors.base.primary} />
     </View>
   );

@@ -14,10 +14,10 @@ export const useCreateOrderMutation = () => {
       const res = await orderService.createOrder(order);
       if (res.data.success) {
         await Promise.all([
-          queryClient.invalidateQueries({
+          queryClient.refetchQueries({
             queryKey: [QUERY_KEY.ORDER.GET_ALL],
           }),
-          queryClient.invalidateQueries({
+          queryClient.refetchQueries({
             queryKey: [QUERY_KEY.ORDER.GET_ITEMS],
           }),
         ]);
@@ -33,7 +33,7 @@ export const useCreateOrderItemMutation = () => {
     mutationFn: async (data: CreateOrderItemFormSchema) => {
       const res = await orderService.createOrderItem(data);
       if (res.data.success) {
-        queryClient.invalidateQueries({
+        await queryClient.refetchQueries({
           queryKey: [QUERY_KEY.ORDER.GET_ITEMS],
         });
       }
@@ -48,7 +48,7 @@ export const useRemoveOrderItemMutation = () => {
     mutationFn: async (id: string) => {
       const res = await orderService.removeOrderItem(id);
       if (res.data.success) {
-        queryClient.invalidateQueries({
+        await queryClient.refetchQueries({
           queryKey: [QUERY_KEY.ORDER.GET_ITEMS],
         });
       }
@@ -66,7 +66,7 @@ export const useUpdateOrderItemQuantityMutation = () => {
         data.quantity,
       );
       if (res.data.success) {
-        queryClient.invalidateQueries({
+        await queryClient.refetchQueries({
           queryKey: [QUERY_KEY.ORDER.GET_ITEMS],
         });
       }
@@ -81,8 +81,8 @@ export const useCancelOrderMutation = () => {
     mutationFn: async (id: string) => {
       const res = await orderService.cancelOrder(id);
       if (res.data.success) {
-        queryClient.invalidateQueries({
-          queryKey: [QUERY_KEY.ORDER.GET_ALL],
+        await queryClient.refetchQueries({
+          queryKey: [QUERY_KEY.ORDER.GET_BY_ID, id],
         });
       }
       return res.data;

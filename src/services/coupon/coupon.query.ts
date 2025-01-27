@@ -2,7 +2,7 @@ import {QUERY_KEY} from '@/constants';
 import {useQuery} from '@tanstack/react-query';
 import {couponService} from './coupon.service';
 
-export const useGetCouponQuery = () => {
+export const useGetAllCouponsQuery = () => {
   return useQuery({
     queryKey: [QUERY_KEY.COUPON.GET_ALL],
     queryFn: async () => {

@@ -3,7 +3,7 @@ import {useChatRoomMessages} from '@/hooks/socket-handler';
 import {FONT_FAMILY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
 import React, {useEffect} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {ActivityIndicator, FlatList, Text, View} from 'react-native';
 import ChatItem from './components/ChatItem';
 import SendMessage from './components/SendMessage';
 
@@ -41,19 +41,23 @@ const OrderContactScreen = ({
     <View style={{flex: 1}}>
       <FlatList
         ref={flatListRef}
-        ListEmptyComponent={() => (
-          <View
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <Text
-              style={{
-                fontFamily: FONT_FAMILY.medium,
-                fontSize: 16,
-                color: colors.layout.foreground,
-              }}>
-              No messages
-            </Text>
-          </View>
-        )}
+        ListEmptyComponent={() =>
+          isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <View
+              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <Text
+                style={{
+                  fontFamily: FONT_FAMILY.medium,
+                  fontSize: 16,
+                  color: colors.layout.foreground,
+                }}>
+                No messages
+              </Text>
+            </View>
+          )
+        }
         onScrollToIndexFailed={({index}) => {
           console.log('scroll failed', index);
           setTimeout(() => {

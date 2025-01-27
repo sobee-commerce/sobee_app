@@ -5,7 +5,6 @@ import {TYPOGRAPHY} from '@/theme';
 import {ApplicationNavigationProps} from '@/types';
 import {useNavigation} from '@react-navigation/native';
 import {ChevronRight} from 'lucide-react-native';
-import React from 'react';
 import {ActivityIndicator, FlatList, Pressable, Text, View} from 'react-native';
 
 type Props = {
@@ -17,6 +16,7 @@ const Reviews = ({productId}: Props) => {
   const navigation = useNavigation<ApplicationNavigationProps>();
   const {data, isLoading} = useGetProductReviewsQuery(productId);
   const reviews = data?.data || [];
+  const total = data?.totalElements || 0;
 
   return (
     <View
@@ -36,7 +36,7 @@ const Reviews = ({productId}: Props) => {
               color: colors.layout.foreground,
             },
           ]}>
-          Reviews ({reviews.length})
+          Reviews ({total})
         </Text>
         <Pressable
           onPress={() => navigation.navigate('ProductReview', {productId})}
@@ -68,7 +68,7 @@ const Reviews = ({productId}: Props) => {
                 color: colors.layout.foreground,
                 textAlign: 'center',
               }}>
-              No questions yet
+              No reviews yet
             </Text>
           )}
           showsVerticalScrollIndicator={false}

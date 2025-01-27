@@ -3,9 +3,9 @@ import {formatCurrency} from '@/lib';
 import {IProduct} from '@/lib/interfaces';
 import {ApplicationNavigationProps} from '@/types';
 import {APP_CONFIG, FONT_FAMILY, TYPOGRAPHY} from '@/utils';
+import {optimizeImageSrc} from '@/utils/image';
 import {useNavigation} from '@react-navigation/native';
 import {Star} from 'lucide-react-native';
-import React from 'react';
 import {
   Image,
   Pressable,
@@ -47,7 +47,7 @@ const ProductCard = ({product, style}: ProductCardProps) => {
         style,
       ])}>
       <Image
-        source={{uri: product.thumbnail, width: 100, height: 100}}
+        source={{uri: optimizeImageSrc(product.thumbnail, 140, 140)}}
         width={100}
         height={100}
         style={{

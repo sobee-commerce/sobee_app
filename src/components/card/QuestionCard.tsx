@@ -4,10 +4,10 @@ import {useLikeQuestionMutation} from '@/services';
 import {FONT_FAMILY} from '@/theme';
 import {ApplicationNavigationProps} from '@/types';
 import {APP_CONFIG, STORAGE} from '@/utils';
+import {optimizeImageSrc} from '@/utils/image';
 import {useNavigation} from '@react-navigation/native';
 import {format} from 'date-fns';
 import {Heart} from 'lucide-react-native';
-import React from 'react';
 import {Image, Pressable, Text, View} from 'react-native';
 
 type Props = {
@@ -20,6 +20,8 @@ const QuestionCard = ({question}: Props) => {
   const reply = question.answer as IReply;
   const navigation = useNavigation<ApplicationNavigationProps>();
 
+  const isOwner =
+    STORAGE.getString(APP_CONFIG.STORAGE_KEY.USER_ID) === customer._id;
   const isLiked = question.likes?.some(
     l => l === STORAGE.getString(APP_CONFIG.STORAGE_KEY.USER_ID),
   );
@@ -37,7 +39,7 @@ const QuestionCard = ({question}: Props) => {
         gap: 12,
       }}>
       <Image
-        source={{uri: customer.avatar}}
+        source={{uri: optimizeImageSrc(customer.avatar, 40, 40)}}
         style={{width: 30, height: 30, borderRadius: 20}}
         resizeMode="contain"
       />
@@ -96,27 +98,29 @@ const QuestionCard = ({question}: Props) => {
                 {(question.likes || []).length || 0} likes
               </Text>
             </Pressable>
-            <Pressable
-              onPress={() =>
-                navigation.navigate('AskQuestion', {
-                  productId: question.product as string,
-                  data: question,
-                })
-              }
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 4,
-              }}>
-              <Text
+            {isOwner && (
+              <Pressable
+                onPress={() =>
+                  navigation.navigate('AskQuestion', {
+                    productId: question.product as string,
+                    data: question,
+                  })
+                }
                 style={{
-                  fontFamily: FONT_FAMILY.regular,
-                  fontSize: 12,
-                  color: colors.base.primary,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 4,
                 }}>
-                Edit your question
-              </Text>
-            </Pressable>
+                <Text
+                  style={{
+                    fontFamily: FONT_FAMILY.regular,
+                    fontSize: 12,
+                    color: colors.base.primary,
+                  }}>
+                  Edit your question
+                </Text>
+              </Pressable>
+            )}
           </View>
         </View>
         {reply && (

@@ -4,7 +4,7 @@ import {useTheme} from '@/context';
 import {useGetBrandByIdQuery} from '@/services';
 import {ApplicationScreenProps} from '@/types';
 import {APP_CONFIG} from '@/utils';
-import React, {useEffect, useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
