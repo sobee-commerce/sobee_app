@@ -1,12 +1,14 @@
-import {useTheme} from '@/context';
+import {useAuthContext, useTheme} from '@/context';
+import {ICustomer, IUser} from '@/lib/interfaces';
 import {useGetMeQuery} from '@/services';
 import {ApplicationScreenProps} from '@/types';
 import {APP_CONFIG, STORAGE} from '@/utils';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {ActivityIndicator, Image, View} from 'react-native';
 
 const SplashScreen = ({navigation}: ApplicationScreenProps<'Splash'>) => {
   const {theme, colors} = useTheme();
+  const {setUser} = useAuthContext();
 
   const {isSuccess, isError, data} = useGetMeQuery();
 
@@ -18,8 +20,8 @@ const SplashScreen = ({navigation}: ApplicationScreenProps<'Splash'>) => {
           : 'Onboarding';
       navigation.replace(route);
     }
-
-    if (isSuccess) {
+    if (isSuccess && data?.data?.user) {
+      setUser(data?.data.user as IUser<ICustomer>);
       navigation.replace('Main');
     }
   }, [data, isError, isSuccess, navigation]);

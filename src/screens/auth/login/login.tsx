@@ -1,14 +1,15 @@
 import {Button, Input} from '@/components/common';
-import {useTheme} from '@/context';
+import {useAuthContext, useTheme} from '@/context';
 import {LoginFormSchema, loginFormSchema} from '@/lib/form-schema';
+import {ICustomer, IUser} from '@/lib/interfaces';
 import {useLoginMutation} from '@/services';
 import {TYPOGRAPHY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
 import {APP_CONFIG, STORAGE} from '@/utils';
 import {zodResolver} from '@hookform/resolvers/zod';
-import React from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {
+  Alert,
   Pressable,
   ScrollView,
   StatusBar,
@@ -28,21 +29,30 @@ const LoginScreen = ({navigation}: ApplicationScreenProps<'Login'>) => {
   });
 
   const {mutate, isPending} = useLoginMutation();
+  const {setUser} = useAuthContext();
 
   const onSubmit = (_data: LoginFormSchema) => {
     mutate(_data, {
       onSuccess: data => {
-        ToastAndroid.show(data.message, ToastAndroid.SHORT);
-        STORAGE.set(APP_CONFIG.STORAGE_KEY.ACCESS_TOKEN, data.data.accessToken);
-        STORAGE.set(
-          APP_CONFIG.STORAGE_KEY.REFRESH_TOKEN,
-          data.data.refreshToken,
-        );
-        STORAGE.set(APP_CONFIG.STORAGE_KEY.USER_ID, data.data.user._id!);
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Main'}],
-        });
+        if (data.success) {
+          ToastAndroid.show(data.message, ToastAndroid.SHORT);
+          STORAGE.set(
+            APP_CONFIG.STORAGE_KEY.ACCESS_TOKEN,
+            data.data.accessToken,
+          );
+          STORAGE.set(
+            APP_CONFIG.STORAGE_KEY.REFRESH_TOKEN,
+            data.data.refreshToken,
+          );
+          STORAGE.set(APP_CONFIG.STORAGE_KEY.USER_ID, data.data.user._id!);
+          setUser(data.data.user as IUser<ICustomer>);
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Main'}],
+          });
+        } else {
+          Alert.alert('Error', data.message);
+        }
       },
       onError: (error: any) => {
         ToastAndroid.show(
@@ -91,6 +101,8 @@ const LoginScreen = ({navigation}: ApplicationScreenProps<'Login'>) => {
                 isInvalid={!!errors.emailOrPhone}
                 errorMessage={errors.emailOrPhone?.message}
                 isDisabled={isPending}
+                autoCapitalize="none"
+                keyboardType="email-address"
               />
             )}
           />
@@ -113,6 +125,20 @@ const LoginScreen = ({navigation}: ApplicationScreenProps<'Login'>) => {
               />
             )}
           />
+
+          <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
+            <Text
+              style={[
+                TYPOGRAPHY.button,
+                {
+                  color: colors.base.secondary,
+                  textAlign: 'right',
+                  textDecorationLine: 'underline',
+                },
+              ]}>
+              Forgot password?
+            </Text>
+          </Pressable>
 
           <Button
             color="primary"

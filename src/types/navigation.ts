@@ -47,6 +47,7 @@ export type ApplicationStackParamList = {
   EditProfile: undefined;
   ForgotPassword: undefined;
   SavedCoupon: undefined;
+  ValidateOtp: {email: string};
 };
 
 /**

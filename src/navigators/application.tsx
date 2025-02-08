@@ -31,6 +31,7 @@ import {
   SplashScreen,
 } from '@/screens';
 import ForgotPassword from '@/screens/auth/forgot-password';
+import ValidateOtp from '@/screens/auth/validate-otp';
 import SettingsScreen from '@/screens/settings/settings';
 import ChangePassword from '@/screens/user/profile/change-password';
 import EditProfile from '@/screens/user/profile/edit-profile';
@@ -170,6 +171,13 @@ function ApplicationNavigator() {
             component={ForgotPassword}
             options={{
               title: 'Forgot Password',
+            }}
+          />
+          <Stack.Screen
+            name="ValidateOtp"
+            component={ValidateOtp}
+            options={{
+              title: 'Validate OTP',
             }}
           />
           <Stack.Screen

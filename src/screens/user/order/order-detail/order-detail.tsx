@@ -61,10 +61,7 @@ const OrderDetailScreen = ({
   const order = getOrderQuery.data?.data || ({} as IOrder);
   const orderItems = (order.orderItems || []) as IOrderItem[];
 
-  const subTotal = orderItems.reduce(
-    (acc, item) => acc + item.price! * item.amount,
-    0,
-  );
+  const subTotal = orderItems.reduce((acc, item) => acc + item.subTotal!, 0);
 
   useEffect(() => {
     if (isSuccess) {
@@ -109,7 +106,10 @@ const OrderDetailScreen = ({
     });
   };
 
-  const shippingAddress = (order.shippingAddress || {}) as IAddress;
+  const shippingAddress = useMemo(
+    () => (order.shippingAddress || {}) as IAddress,
+    [order.shippingAddress],
+  );
 
   const addressString = useMemo(() => {
     return [
@@ -158,6 +158,7 @@ const OrderDetailScreen = ({
         style={{flex: 1}}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{gap: 12, padding: 20}}>
+        {getOrderQuery.isRefetching && <ActivityIndicator />}
         <Text
           style={{
             fontSize: 20,

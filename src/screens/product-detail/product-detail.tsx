@@ -2,6 +2,7 @@ import {ProductCard} from '@/components/card';
 import {Button, LabelItemList} from '@/components/common';
 import {useTheme} from '@/context';
 import {formatCurrency} from '@/lib';
+import {EProductType} from '@/lib/enum';
 import {IBrand, ICategory} from '@/lib/interfaces';
 import {
   useCreateOrderItemMutation,
@@ -15,7 +16,14 @@ import {FONT_FAMILY, TYPOGRAPHY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
 import {APP_CONFIG} from '@/utils';
 import {Heart, Minus, Plus} from 'lucide-react-native';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -32,6 +40,7 @@ import {Rating} from 'react-native-ratings';
 import Animated, {SlideInDown, SlideOutDown} from 'react-native-reanimated';
 import Questions from './components/Questions';
 import Reviews from './components/Reviews';
+import {productInitialState, productReducer} from './product-reducer';
 
 const ProductDetailScreen = ({
   navigation,
@@ -40,15 +49,28 @@ const ProductDetailScreen = ({
   const {productId, name} = route.params;
   const {colors} = useTheme();
   const {data, isLoading} = useGetFavoriteProductsQuery();
-  const favoriteProducts = data?.data || [];
-  const isFavorite = !!favoriteProducts.find(f => f._id === productId);
+  const favoriteProducts = useMemo(() => data?.data || [], [data?.data]);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const _isFavorite = !!favoriteProducts.find(f => f._id === productId);
+    setIsFavorite(_isFavorite);
+  }, [favoriteProducts, productId]);
 
   const {mutate} = useToggleFavoriteProduct();
 
   const onToggleFavorite = useCallback(() => {
+    setIsFavorite(prev => !prev);
     mutate(productId, {
-      onSuccess: ({message}) => {
-        ToastAndroid.show(message, ToastAndroid.SHORT);
+      onSuccess: ({message, success}) => {
+        if (!success) {
+          setIsFavorite(prev => !prev);
+          ToastAndroid.show(message, ToastAndroid.SHORT);
+        }
+      },
+      onError: (err: any) => {
+        setIsFavorite(prev => !prev);
+        Alert.alert('Error', err?.response?.data?.message || err.message);
       },
     });
   }, [mutate, productId]);
@@ -95,7 +117,10 @@ const ProductDetailScreen = ({
   const brand = product?.brand as IBrand;
   const relatedProducts = getRelatedProductsQuery.data?.data || [];
   const recommendedProducts = getRecommendedProductsQuery.data?.data || [];
-
+  const [{quantity, selectedVariants}, dispatch] = useReducer(
+    productReducer,
+    productInitialState,
+  );
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({y: 0, animated: true});
@@ -105,7 +130,7 @@ const ProductDetailScreen = ({
   const calculateDiscount = useCallback(
     (price: number = 0) => {
       const discount = product?.discount || 0;
-      return price - (price * discount) / 100;
+      return price - price * discount;
     },
     [product?.discount],
   );
@@ -113,6 +138,8 @@ const ProductDetailScreen = ({
   const discountPrice = useMemo(() => {
     return product?.type === 'SIMPLE'
       ? [calculateDiscount(product?.displayPrice)]
+      : product?.minPrice === product?.maxPrice
+      ? [calculateDiscount(product?.minPrice)]
       : [
           calculateDiscount(product?.minPrice),
           calculateDiscount(product?.maxPrice),
@@ -125,11 +152,6 @@ const ProductDetailScreen = ({
     product?.type,
   ]);
 
-  const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState({
-    size: '',
-    color: '',
-  });
   const [showAddToCart, setShowAddToCart] = useState(false);
 
   const variants = useMemo(() => product?.variants || [], [product?.variants]);
@@ -148,7 +170,7 @@ const ProductDetailScreen = ({
     [variants],
   );
 
-  const renderDiscountPrice = useCallback(() => {
+  const renderDiscountPrice = useMemo(() => {
     return discountPrice?.map(v => formatCurrency(v * quantity)).join(' - ');
   }, [discountPrice, quantity]);
 
@@ -156,6 +178,8 @@ const ProductDetailScreen = ({
     return (
       product?.type === 'SIMPLE'
         ? [product?.displayPrice]
+        : product?.minPrice === product?.maxPrice
+        ? [product?.minPrice || 0]
         : [product?.minPrice || 0, product?.maxPrice || 0]
     )
       .map(v => formatCurrency(v * quantity))
@@ -168,6 +192,26 @@ const ProductDetailScreen = ({
     quantity,
   ]);
 
+  const getViaSelectedVariants = useMemo(() => {
+    const color = selectedVariants.color;
+    const size = selectedVariants.size;
+    const variant = product?.variants?.find(
+      v => v.color === color && v.size === size,
+    );
+    return variant;
+  }, [product, selectedVariants]);
+
+  useEffect(() => {
+    if (getViaSelectedVariants) {
+      if (quantity > getViaSelectedVariants.amount) {
+        dispatch({
+          type: 'SET_QUANTITY',
+          payload: getViaSelectedVariants.amount,
+        });
+      }
+    }
+  }, [getViaSelectedVariants, quantity]);
+
   const addToCartMutation = useCreateOrderItemMutation();
 
   const onPressAddToCart = useCallback(() => {
@@ -175,8 +219,8 @@ const ProductDetailScreen = ({
       {
         amount: quantity,
         product: productId,
-        color: selectedVariant.color,
-        size: selectedVariant.size,
+        color: selectedVariants.color,
+        size: selectedVariants.size,
       },
       {
         onSuccess: _data => {
@@ -192,7 +236,7 @@ const ProductDetailScreen = ({
         },
       },
     );
-  }, [addToCartMutation, productId, quantity, selectedVariant]);
+  }, [addToCartMutation, productId, quantity, selectedVariants]);
 
   if (getProductQuery.isLoading) {
     return <ActivityIndicator />;
@@ -291,6 +335,7 @@ const ProductDetailScreen = ({
               marginVertical: 8,
               textDecorationColor: colors.default.default400,
               textDecorationLine: product.isDiscount ? 'line-through' : 'none',
+              fontSize: product.isDiscount ? 16 : 24,
             }}>
             {renderPrice}
           </Text>
@@ -301,7 +346,8 @@ const ProductDetailScreen = ({
                 color: colors.base.success,
                 marginVertical: 8,
               }}>
-              {renderDiscountPrice()}
+              {renderDiscountPrice}{' '}
+              <Text style={{fontSize: 16}}>(-{product.discount! * 100}%)</Text>
             </Text>
           )}
 
@@ -436,12 +482,12 @@ const ProductDetailScreen = ({
                     data={variant.values}
                     renderItem={({item}) => (
                       <Pressable
-                        onPress={() => {
-                          setSelectedVariant({
-                            ...selectedVariant,
-                            [variant.name]: item,
-                          });
-                        }}
+                        onPress={() =>
+                          dispatch({
+                            type: 'SET_SELECTED_VARIANTS',
+                            payload: {[variant.name]: item},
+                          })
+                        }
                         style={{
                           paddingHorizontal: 8,
                           paddingVertical: 4,
@@ -455,8 +501,7 @@ const ProductDetailScreen = ({
                           minHeight: 30,
                           borderWidth: 3,
                           borderColor:
-                            //@ts-ignore
-                            selectedVariant[variant.name] === item
+                            selectedVariants[variant.name] === item
                               ? colors.base.primary
                               : colors.default.default200,
                         }}>
@@ -476,6 +521,15 @@ const ProductDetailScreen = ({
                 </View>
               ))}
             </View>
+          )}
+          {getViaSelectedVariants && (
+            <Text
+              style={{
+                ...TYPOGRAPHY.body1,
+                color: colors.layout.foreground,
+              }}>
+              {getViaSelectedVariants?.amount} available in stock
+            </Text>
           )}
           <View
             style={{
@@ -497,10 +551,12 @@ const ProductDetailScreen = ({
                 gap: 20,
               }}>
               <Pressable
+                disabled={quantity === 1}
                 onPress={() => {
-                  if (quantity > 1) {
-                    setQuantity(quantity - 1);
-                  }
+                  dispatch({
+                    type: 'SET_QUANTITY',
+                    payload: quantity - 1,
+                  });
                 }}
                 style={{
                   padding: 8,
@@ -521,10 +577,17 @@ const ProductDetailScreen = ({
                 {quantity}
               </Text>
               <Pressable
+                disabled={
+                  product.type === EProductType.VARIABLE &&
+                  (!getViaSelectedVariants ||
+                    (getViaSelectedVariants &&
+                      quantity >= getViaSelectedVariants.amount))
+                }
                 onPress={() => {
-                  if (quantity < product.quantity) {
-                    setQuantity(quantity + 1);
-                  }
+                  dispatch({
+                    type: 'SET_QUANTITY',
+                    payload: quantity + 1,
+                  });
                 }}
                 style={{
                   padding: 8,
@@ -545,7 +608,7 @@ const ProductDetailScreen = ({
             isLoading={addToCartMutation.isPending}
             isDisabled={
               (product.type === 'VARIABLE' &&
-                (!selectedVariant.size || !selectedVariant.color)) ||
+                (!selectedVariants.size || !selectedVariants.color)) ||
               addToCartMutation.isPending
             }>
             <Text

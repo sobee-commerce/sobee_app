@@ -6,10 +6,7 @@ import apiClient from '../api-client';
 export const productService = {
   getProducts: async (query?: any) =>
     await apiClient.get<BaseResponse<IProduct[]>>(
-      API_ROUTES.PRODUCT.GET_PUBLISHED_PRODUCTS,
-      {
-        params: query,
-      },
+      API_ROUTES.PRODUCT.GET_PUBLISHED_PRODUCTS + (query ? `?${query}` : ''),
     ),
   getProduct: async (id: string) =>
     await apiClient.get<BaseResponse<IProduct>>(
@@ -49,4 +46,6 @@ export const productService = {
       API_ROUTES.PRODUCT.TOGGLE_FAVORITE_PRODUCT.replace(':id', id),
       {},
     ),
+  getProductColors: async () =>
+    await apiClient.get<BaseResponse<string[]>>(API_ROUTES.PRODUCT.GET_COLORS),
 };

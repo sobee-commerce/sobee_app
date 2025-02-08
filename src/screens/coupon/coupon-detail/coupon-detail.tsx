@@ -1,9 +1,12 @@
-import {Button} from '@/components/common';
+import {ProductCard} from '@/components/card';
+import {Button, LabelItemList} from '@/components/common';
 import {useTheme} from '@/context';
 import {formatCurrency} from '@/lib';
-import {useGetCouponByIdQuery} from '@/services';
+import {IProduct} from '@/lib/interfaces';
+import {useGetCouponByCodeQuery} from '@/services';
 import {TYPOGRAPHY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
+import {APP_CONFIG} from '@/utils';
 import {optimizeImageSrc} from '@/utils/image';
 import {format} from 'date-fns';
 import {useEffect} from 'react';
@@ -13,15 +16,15 @@ const CouponDetail = ({
   navigation,
   route,
 }: ApplicationScreenProps<'CouponDetail'>) => {
-  const {couponId} = route.params;
-  const {data, isLoading} = useGetCouponByIdQuery(couponId);
+  const {couponCode} = route.params;
+  const {data, isLoading} = useGetCouponByCodeQuery(couponCode);
   const coupon = data?.data;
   const {colors} = useTheme();
   console.log(coupon);
 
   useEffect(() => {
-    navigation.setOptions({title: coupon?.code});
-  }, [coupon]);
+    navigation.setOptions({title: couponCode});
+  }, [couponCode]);
 
   return isLoading ? (
     <ActivityIndicator />
@@ -72,16 +75,30 @@ const CouponDetail = ({
           ]}>
           Apply to: {coupon.applyTo}
         </Text>
-        {/* {coupon.applyTo === 'Specific' && (
-        <View>
-          <LabelItemList
-            data={coupon.productApply as IProduct[]}
-            label="Applied Products"
-            renderItem={({item}) => <ProductCard product={item} />}
-            showNavigation={false}
-          />
-        </View>
-      )} */}
+        {coupon.applyTo === 'Specific' && (
+          <View>
+            <LabelItemList
+              data={coupon.productApply as IProduct[]}
+              label="Applied Products"
+              renderItem={({item}) => (
+                <ProductCard
+                  product={item}
+                  style={{
+                    width: APP_CONFIG.SCREEN.WIDTH / 2 - 26,
+                  }}
+                />
+              )}
+              showNavigation={false}
+              listProps={{
+                numColumns: 2,
+                scrollEnabled: false,
+                columnWrapperStyle: {gap: 12},
+                contentContainerStyle: {gap: 12},
+                style: {gap: 12},
+              }}
+            />
+          </View>
+        )}
       </ScrollView>
       <Button
         style={{

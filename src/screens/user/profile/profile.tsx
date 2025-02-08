@@ -1,11 +1,11 @@
 import {Button} from '@/components/common';
 import {DEFAULT_IMAGE} from '@/constants';
-import {useTheme} from '@/context';
-import {useGetMeQuery, useLogoutMutation} from '@/services';
+import {useAuthContext, useTheme} from '@/context';
+import {useLogoutMutation} from '@/services';
 import {ApplicationScreenProps} from '@/types';
 import {APP_CONFIG, STORAGE, TYPOGRAPHY} from '@/utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {LogOut, Moon, PencilLine, Sun} from 'lucide-react-native';
+import {LogOut, Moon, Sun} from 'lucide-react-native';
 import {
   Image,
   ScrollView,
@@ -21,8 +21,7 @@ import MenuItem from './components/MenuItem';
 const ProfileScreen = ({navigation}: ApplicationScreenProps<'Profile'>) => {
   const {toggleTheme, colors, theme} = useTheme();
   const {isPending, mutate} = useLogoutMutation();
-  const {data} = useGetMeQuery();
-  const user = data?.data.user;
+  const {user} = useAuthContext();
   const queryClient = useQueryClient();
 
   const onPressLogout = () => {
@@ -106,30 +105,33 @@ const ProfileScreen = ({navigation}: ApplicationScreenProps<'Profile'>) => {
               ]}>
               {user?.phoneNumber || 'N/A'}
             </Text>
-            <Button
-              radius="full"
-              size="sm"
-              color="secondary"
-              endContent={
-                <PencilLine size={20} color={colors.white} strokeWidth={1.5} />
-              }>
-              <Text
-                style={[
-                  TYPOGRAPHY.button,
-                  {
-                    color: colors.white,
-                  },
-                ]}>
-                Edit Profile
-              </Text>
-            </Button>
           </View>
         </View>
       </LinearGradient>
       <View style={{marginTop: 40, gap: 16, padding: 20}}>
         <MenuItem
+          label="Edit profile"
+          onPress={() => navigation.navigate('EditProfile')}
+        />
+
+        <MenuItem
           label="Address"
           onPress={() => navigation.navigate('Address')}
+        />
+
+        <MenuItem
+          label="Favorite products"
+          onPress={() => navigation.navigate('Favorite')}
+        />
+
+        <MenuItem
+          label="Saved coupons"
+          onPress={() => navigation.navigate('SavedCoupon')}
+        />
+
+        <MenuItem
+          label="Change password"
+          onPress={() => navigation.navigate('ChangePassword')}
         />
 
         <MenuItem
