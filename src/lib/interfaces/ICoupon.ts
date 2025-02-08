@@ -1,4 +1,4 @@
-import {ECouponApplyType, ECouponStatus, ECouponType} from '@/_lib/enums';
+import {ECouponApplyType, ECouponStatus, ECouponType} from '@/lib/enum';
 import {ICustomer} from './ICustomer';
 import {IProduct} from './IProduct';
 
@@ -14,6 +14,7 @@ export interface ICoupon {
   usageLimit: number;
   usageCount: number;
   customerUsed: string[] | ICustomer[];
+  customerSaved: string[] | ICustomer[];
   status: ECouponStatus;
   applyTo: ECouponApplyType;
   productApply: string[] | IProduct[];

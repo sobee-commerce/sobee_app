@@ -82,7 +82,9 @@ export const API_ROUTES = {
     GET_COUPONS: '/coupon',
     GET_TODAY_COUPONS: '/coupon/today',
     APPLY_COUPON: '/coupon/validate',
-    GET_COUPON: '/coupon/:id',
+    GET_COUPON_BY_CODE: '/coupon/code/:code',
+    SAVE_COUPON: '/coupon/:code/save',
+    GET_SAVE_COUPONS: '/coupon/saved',
   },
   QUESTION: {
     GET_PRODUCT_QUESTIONS: '/question/product/:id',
@@ -101,6 +103,7 @@ export const API_ROUTES = {
     DELETE_ORDER_ITEM: '/order/item/:id',
     CANCEL_ORDER: '/order/:id/status/cancel',
     GET_ORDER_ITEMS: '/order/item',
+    PAY: '/order/payment-sheet',
   },
   PAYMENT_METHODS: {
     GET_PAYMENT_METHODS: '/payment-method',

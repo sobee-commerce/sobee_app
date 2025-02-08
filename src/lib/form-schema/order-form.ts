@@ -33,6 +33,7 @@ export const createOrderFormSchema = z.object({
   emailAddress: z.string().optional(),
   note: z.string().optional(),
   coupon: z.string().optional(),
+  isPaid: z.boolean().optional().default(false),
 });
 
 export type CreateOrderFormSchema = z.infer<typeof createOrderFormSchema>;

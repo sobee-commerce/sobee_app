@@ -9,9 +9,9 @@ export const couponService = {
     await apiClient.get<BaseResponse<ICoupon[]>>(
       API_ROUTES.COUPONS.GET_COUPONS,
     ),
-  getCouponById: async (id: string) =>
+  getCouponByCode: async (code: string) =>
     await apiClient.get<BaseResponse<ICoupon>>(
-      API_ROUTES.COUPONS.GET_COUPON.replace(':id', id),
+      API_ROUTES.COUPONS.GET_COUPON_BY_CODE.replace(':code', code),
     ),
   getTodayCoupons: async () =>
     await apiClient.get<BaseResponse<ICoupon[]>>(
@@ -21,5 +21,14 @@ export const couponService = {
     await apiClient.post<BaseResponse<ICoupon>>(
       API_ROUTES.COUPONS.APPLY_COUPON,
       data,
+    ),
+
+  saveCoupon: async (code: string) =>
+    await apiClient.put<BaseResponse<ICoupon>>(
+      API_ROUTES.COUPONS.SAVE_COUPON.replace(':code', code),
+    ),
+  getSaveCoupons: async () =>
+    await apiClient.get<BaseResponse<ICoupon[]>>(
+      API_ROUTES.COUPONS.GET_SAVE_COUPONS,
     ),
 };

@@ -1,6 +1,6 @@
 import {useTheme} from '@/context';
 import {formatCurrency} from '@/lib';
-import {IProduct} from '@/lib/interfaces';
+import {ICategory, IProduct} from '@/lib/interfaces';
 import {ApplicationNavigationProps} from '@/types';
 import {APP_CONFIG, FONT_FAMILY, TYPOGRAPHY} from '@/utils';
 import {optimizeImageSrc} from '@/utils/image';
@@ -25,6 +25,8 @@ const ProductCard = ({product, style}: ProductCardProps) => {
   const {colors} = useTheme();
   const navigation = useNavigation<ApplicationNavigationProps>();
 
+  const category = product.category as ICategory;
+
   const onPress = () => {
     navigation.navigate('ProductDetail', {
       productId: product._id!,
@@ -47,7 +49,7 @@ const ProductCard = ({product, style}: ProductCardProps) => {
         style,
       ])}>
       <Image
-        source={{uri: optimizeImageSrc(product.thumbnail, 140, 140)}}
+        source={{uri: optimizeImageSrc(product?.thumbnail, 140, 140)}}
         width={100}
         height={100}
         style={{
@@ -80,6 +82,15 @@ const ProductCard = ({product, style}: ProductCardProps) => {
             ''
           )}
           {product.name}
+        </Text>
+        <Text
+          style={{
+            color: colors.primary.primary200,
+            fontSize: 12,
+            fontFamily: FONT_FAMILY.medium,
+            letterSpacing: 0.5,
+          }}>
+          #{category.name}
         </Text>
         <View
           style={[

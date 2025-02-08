@@ -12,11 +12,11 @@ export const useGetAllCouponsQuery = () => {
   });
 };
 
-export const useGetCouponByIdQuery = (id: string) => {
+export const useGetCouponByCodeQuery = (code: string) => {
   return useQuery({
-    queryKey: [QUERY_KEY.COUPON.GET_BY_ID, id],
+    queryKey: [QUERY_KEY.COUPON.GET_BY_CODE, code],
     queryFn: async () => {
-      const res = await couponService.getCouponById(id);
+      const res = await couponService.getCouponByCode(code);
       return res.data;
     },
   });
@@ -27,6 +27,16 @@ export const useGetTodayCouponsQuery = () => {
     queryKey: [QUERY_KEY.COUPON.GET_TODAY],
     queryFn: async () => {
       const res = await couponService.getTodayCoupons();
+      return res.data;
+    },
+  });
+};
+
+export const useGetSavedCouponsQuery = () => {
+  return useQuery({
+    queryKey: [QUERY_KEY.COUPON.GET_SAVED],
+    queryFn: async () => {
+      const res = await couponService.getSaveCoupons();
       return res.data;
     },
   });

@@ -91,3 +91,13 @@ export const useGetRecommendedProductsQuery = (productId: string) => {
     },
   });
 };
+
+export const useGetProductColorsQuery = () => {
+  return useQuery({
+    queryKey: [QUERY_KEY.PRODUCT.GET_COLORS],
+    queryFn: async () => {
+      const res = await productService.getProductColors();
+      return res.data;
+    },
+  });
+};

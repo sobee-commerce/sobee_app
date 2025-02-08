@@ -137,7 +137,21 @@ const OrderItemCard = ({
               fontFamily: FONT_FAMILY.semiBold,
               fontSize: 14,
             }}>
-            {formatCurrency(orderItem.price!)}
+            {product.isDiscount ? (
+              <Text
+                style={{
+                  color: colors.base.warning,
+                }}>
+                [-{(product.discount || 0) * 100}%]{' '}
+              </Text>
+            ) : (
+              ''
+            )}
+            {formatCurrency(
+              product.isDiscount
+                ? orderItem.price! * (1 - product.discount!)
+                : orderItem.price!,
+            )}
           </Text>
           {product.isVariation && (
             <View
