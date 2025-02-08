@@ -1,18 +1,20 @@
 import {AddressCard, OrderItemCard} from '@/components/card';
-import {Button, Input} from '@/components/common';
-import {useTheme} from '@/context';
+import {AppCheckbox, Button, Input} from '@/components/common';
+import {useAuthContext, useTheme} from '@/context';
 import {formatCurrency} from '@/lib';
+import {EPaymentMethod} from '@/lib/enum';
 import {CreateOrderFormSchema, createOrderFormSchema} from '@/lib/form-schema';
 import {IProduct, IShipping, ITax} from '@/lib/interfaces';
 import {
+  orderService,
   useCreateOrderMutation,
   useGetAddressQuery,
-  useGetMeQuery,
   useGetOrderItemsQuery,
 } from '@/services';
 import {FONT_FAMILY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {usePaymentSheet} from '@stripe/stripe-react-native';
 import {ChevronsDown, ChevronsUp} from 'lucide-react-native';
 import React, {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
@@ -39,22 +41,21 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
   } = useForm<CreateOrderFormSchema>({
     resolver: zodResolver(createOrderFormSchema),
     defaultValues: {
-      paymentMethod: 'COD',
+      paymentMethod: EPaymentMethod.COD,
     },
   });
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
+  const {user} = useAuthContext();
   const {isLoading, data} = useGetOrderItemsQuery();
   const getAddressesQuery = useGetAddressQuery();
   const createOrderMutation = useCreateOrderMutation();
-  const getMeQuery = useGetMeQuery();
 
   useEffect(() => {
-    const user = getMeQuery.data?.data?.user;
     if (!user) return;
     setValue('phoneNumber', user.phoneNumber);
     setValue('emailAddress', user.email);
-  }, [getMeQuery.data, setValue]);
+  }, [user, setValue]);
 
   const orderItems = useMemo(() => data?.data! || [], [data?.data]);
   const cart = orderItems;
@@ -63,6 +64,8 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
   const [selectedAddress, setSelectedAddress] = React.useState<
     string | undefined
   >(undefined);
+  const paymentMethod = watch('paymentMethod') || EPaymentMethod.COD;
+  const {initPaymentSheet, presentPaymentSheet, loading} = usePaymentSheet();
 
   useEffect(() => {
     if (defaultAddress) {
@@ -113,21 +116,58 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
     setValue('total', total);
   }, [fee, total, setValue]);
 
-  const onPressCheckout = (_data: CreateOrderFormSchema) => {
+  const handleOnlinePayment = async () => {
+    const paymentSheetRes = await orderService.fetchPaymentSheetParams(total);
+    const {paymentIntent, ephemeralKey, customer} = paymentSheetRes.data.data;
+    const {error} = await initPaymentSheet({
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      merchantDisplayName: 'Sobee',
+      allowsDelayedPaymentMethods: true,
+    });
+
+    if (error) {
+      Alert.alert('Error', error.message);
+      return false;
+    }
+
+    const {error: presentError} = await presentPaymentSheet();
+
+    if (presentError) {
+      Alert.alert('Error', presentError.message);
+      return false;
+    }
+
+    return true;
+  };
+
+  const onPressCheckout = async (_data: CreateOrderFormSchema) => {
+    let isSuccessPayment = true;
+    if (paymentMethod === EPaymentMethod.INTERNET_BANKING) {
+      console.log('handle online payment');
+      const isSuccess = await handleOnlinePayment();
+      _data.isPaid = isSuccess;
+      isSuccessPayment = isSuccess;
+    }
+
+    if (!isSuccessPayment) {
+      return;
+    }
     createOrderMutation.mutate(_data, {
-      onSuccess: data => {
-        if (data.success) {
+      onSuccess: d => {
+        if (d.success) {
           navigation.reset({
             index: 0,
             routes: [
               {
                 name: 'Main',
               },
-              {name: 'OrderDetail', params: {orderId: data.data._id}},
+              {name: 'OrderDetail', params: {orderId: d.data._id}},
             ],
           });
         } else {
-          Alert.alert('Error', data.message);
+          Alert.alert('Error', d.message);
         }
       },
       onError: (error: any) => {
@@ -385,6 +425,51 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
             ]}>
             {formatCurrency(total)}
           </Text>
+        </View>
+        <View
+          style={{
+            gap: 8,
+            borderTopColor: colors.layout.divider,
+            borderTopWidth: 1,
+            marginTop: 16,
+            paddingTop: 16,
+          }}>
+          <Text
+            style={{
+              fontFamily: FONT_FAMILY.regular,
+              fontSize: 14,
+              color: colors.layout.foreground,
+            }}>
+            Payment Method
+          </Text>
+          <View style={{gap: 6}}>
+            <AppCheckbox
+              label={{
+                checked: 'Cash on Delivery',
+                unChecked: 'Cash on Delivery',
+              }}
+              value={paymentMethod === EPaymentMethod.COD}
+              onValueChange={value => {
+                setValue(
+                  'paymentMethod',
+                  value ? EPaymentMethod.COD : EPaymentMethod.INTERNET_BANKING,
+                );
+              }}
+            />
+            <AppCheckbox
+              label={{
+                checked: 'Internet Banking',
+                unChecked: 'Internet Banking',
+              }}
+              value={paymentMethod === EPaymentMethod.INTERNET_BANKING}
+              onValueChange={value => {
+                setValue(
+                  'paymentMethod',
+                  !value ? EPaymentMethod.COD : EPaymentMethod.INTERNET_BANKING,
+                );
+              }}
+            />
+          </View>
         </View>
         <Button
           color="primary"

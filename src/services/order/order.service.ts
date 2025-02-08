@@ -40,4 +40,15 @@ export const orderService = {
     await apiClient.delete<BaseResponse<IOrder>>(
       API_ROUTES.ORDER.CANCEL_ORDER.replace(':id', id),
     ),
+  fetchPaymentSheetParams: async (amount: number) =>
+    await apiClient.get<
+      BaseResponse<{
+        paymentIntent: string;
+        ephemeralKey: string;
+        customer: string;
+        publishableKey: string;
+      }>
+    >(API_ROUTES.ORDER.PAY, {
+      params: {amount},
+    }),
 };

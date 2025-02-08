@@ -30,7 +30,11 @@ import {
   ShippingAddressScreen,
   SplashScreen,
 } from '@/screens';
+import ForgotPassword from '@/screens/auth/forgot-password';
 import SettingsScreen from '@/screens/settings/settings';
+import ChangePassword from '@/screens/user/profile/change-password';
+import EditProfile from '@/screens/user/profile/edit-profile';
+import SavedCoupons from '@/screens/user/profile/saved-coupons';
 import type {ApplicationStackParamList} from '@/types/navigation';
 import {APP_CONFIG, FONT_FAMILY, navigationRef} from '@/utils';
 import {StatusBar} from 'react-native';
@@ -147,6 +151,34 @@ function ApplicationNavigator() {
           <Stack.Screen name="Refund" component={OrderRefundScreen} />
           <Stack.Screen name="Review" component={OrderReviewScreen} />
           <Stack.Screen name="ScanQRCode" component={QRScanner} />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+            options={{
+              title: 'Edit Profile',
+            }}
+          />
+          <Stack.Screen
+            name="ChangePassword"
+            component={ChangePassword}
+            options={{
+              title: 'Change Password',
+            }}
+          />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPassword}
+            options={{
+              title: 'Forgot Password',
+            }}
+          />
+          <Stack.Screen
+            name="SavedCoupon"
+            component={SavedCoupons}
+            options={{
+              title: 'Saved Coupons',
+            }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar

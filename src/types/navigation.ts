@@ -36,13 +36,17 @@ export type ApplicationStackParamList = {
   Refund: {orderId: string};
   Review: {orderId: string; data?: IReview};
   Coupon: undefined;
-  CouponDetail: {couponId: string};
+  CouponDetail: {couponCode: string};
   ProductDetail: {productId: string; name: string};
   ProductReview: {productId: string};
   ProductQuestion: {productId: string};
   AskQuestion: {productId: string; data?: IQuestion};
   Favorite: undefined;
   ScanQRCode?: {onSuccess?: (data: string) => void};
+  ChangePassword: undefined;
+  EditProfile: undefined;
+  ForgotPassword: undefined;
+  SavedCoupon: undefined;
 };
 
 /**
