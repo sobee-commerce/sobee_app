@@ -1,10 +1,10 @@
-import {AddressCard, OrderItemCard} from '@/components/card';
+import {AddressCard, CouponCard, OrderItemCard} from '@/components/card';
 import {AppCheckbox, Button, Input} from '@/components/common';
 import {useAuthContext, useTheme} from '@/context';
 import {formatCurrency} from '@/lib';
-import {EPaymentMethod} from '@/lib/enum';
+import {ECouponType, EPaymentMethod} from '@/lib/enum';
 import {CreateOrderFormSchema, createOrderFormSchema} from '@/lib/form-schema';
-import {IProduct, IShipping, ITax} from '@/lib/interfaces';
+import {ICoupon, IProduct, IShipping, ITax} from '@/lib/interfaces';
 import {
   orderService,
   useCreateOrderMutation,
@@ -64,6 +64,9 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
   const [selectedAddress, setSelectedAddress] = React.useState<
     string | undefined
   >(undefined);
+  const [selectedVoucher, setSelectedVoucher] = React.useState<ICoupon | null>(
+    null,
+  );
   const paymentMethod = watch('paymentMethod') || EPaymentMethod.COD;
   const {initPaymentSheet, presentPaymentSheet, loading} = usePaymentSheet();
 
@@ -108,7 +111,14 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
     return {sf, tf};
   }, [cart]);
 
-  const total = subTotal + fee.sf + fee.tf;
+  const total = !selectedVoucher
+    ? subTotal + fee.sf + fee.tf
+    : selectedVoucher.type === ECouponType.FIXED
+    ? subTotal + fee.sf + fee.tf - selectedVoucher.discountValue
+    : subTotal +
+      fee.sf +
+      fee.tf -
+      (selectedVoucher.discountValue * subTotal) / 100;
 
   useEffect(() => {
     setValue('shippingFee', fee.sf);
@@ -281,6 +291,64 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
           </View>
         </View>
 
+        <View
+          style={{
+            gap: 12,
+          }}>
+          <Text
+            style={{
+              fontFamily: FONT_FAMILY.medium,
+              fontSize: 16,
+              color: colors.layout.foreground,
+            }}>
+            Voucher
+          </Text>
+          {selectedVoucher && (
+            <View
+              style={{
+                gap: 8,
+              }}>
+              <View style={{flex: 1}}>
+                <CouponCard coupon={selectedVoucher} />
+              </View>
+              <Pressable
+                onPress={() => setSelectedVoucher(null)}
+                hitSlop={10}
+                style={{
+                  alignSelf: 'flex-end',
+                }}>
+                <Text
+                  style={{
+                    fontFamily: FONT_FAMILY.medium,
+                    color: colors.base.danger,
+                    textAlign: 'right',
+                  }}>
+                  Remove Voucher
+                </Text>
+              </Pressable>
+            </View>
+          )}
+          <Button
+            color="primary"
+            onPress={() =>
+              navigation.navigate('SelectVoucher', {
+                selectedVoucher,
+                onSelect: (voucher: ICoupon) => {
+                  setSelectedVoucher(voucher);
+                  navigation.goBack();
+                },
+              })
+            }>
+            <Text
+              style={{
+                fontFamily: FONT_FAMILY.medium,
+                color: colors.white,
+              }}>
+              {selectedVoucher ? 'Change' : 'Select'} Voucher
+            </Text>
+          </Button>
+        </View>
+
         <FlatList
           ListHeaderComponent={() => (
             <Text
@@ -308,184 +376,219 @@ const CheckoutScreen = ({navigation}: ApplicationScreenProps<'Checkout'>) => {
           keyExtractor={item => item._id!}
           renderItem={({item}) => <OrderItemCard orderItem={item} />}
         />
-      </ScrollView>
-      <View
-        style={{
-          padding: 20,
-          borderTopWidth: 1,
-          borderTopColor: colors.layout.divider,
-        }}>
-        <Pressable
-          style={{
-            alignSelf: 'flex-end',
-            marginBottom: 16,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-          }}
-          onPress={() => setCollapsed(!collapsed)}>
-          <Text
-            style={{
-              fontFamily: FONT_FAMILY.regular,
-              color: colors.layout.foreground,
-            }}>
-            {collapsed ? 'Show' : 'Hide'} Order Summary
-          </Text>
-          {collapsed ? (
-            <ChevronsUp size={20} color={colors.layout.foreground} />
-          ) : (
-            <ChevronsDown size={20} color={colors.layout.foreground} />
-          )}
-        </Pressable>
-        {!collapsed && (
-          <>
-            <View style={styles.meta}>
-              <Text
-                style={[
-                  styles.metaText,
-                  {
-                    color: colors.default.default500,
-                  },
-                ]}>
-                Subtotal:
-              </Text>
-              <Text
-                style={[
-                  styles.price,
-                  {
-                    color: colors.layout.foreground,
-                  },
-                ]}>
-                {formatCurrency(subTotal)}
-              </Text>
-            </View>
-            <View style={styles.meta}>
-              <Text
-                style={[
-                  styles.metaText,
-                  {
-                    color: colors.default.default500,
-                  },
-                ]}>
-                Shipping Fee:
-              </Text>
-              <Text
-                style={[
-                  styles.price,
-                  {
-                    color: colors.layout.foreground,
-                  },
-                ]}>
-                {formatCurrency(fee.sf)}
-              </Text>
-            </View>
-
-            <View style={styles.meta}>
-              <Text
-                style={[
-                  styles.metaText,
-                  {
-                    color: colors.default.default500,
-                  },
-                ]}>
-                Tax Fee:
-              </Text>
-              <Text
-                style={[
-                  styles.price,
-                  {
-                    color: colors.layout.foreground,
-                  },
-                ]}>
-                {formatCurrency(fee.tf)}
-              </Text>
-            </View>
-          </>
-        )}
-        <View style={styles.meta}>
-          <Text
-            style={[
-              styles.metaText,
-              {
-                color: colors.base.primary,
-                fontSize: 20,
-                fontFamily: FONT_FAMILY.semiBold,
-              },
-            ]}>
-            Total:
-          </Text>
-          <Text
-            style={[
-              styles.price,
-              {
-                color: colors.base.primary,
-                fontSize: 20,
-                fontFamily: FONT_FAMILY.semiBold,
-              },
-            ]}>
-            {formatCurrency(total)}
-          </Text>
-        </View>
         <View
           style={{
-            gap: 8,
-            borderTopColor: colors.layout.divider,
             borderTopWidth: 1,
-            marginTop: 16,
-            paddingTop: 16,
+            borderTopColor: colors.layout.divider,
+            paddingVertical: 20,
           }}>
-          <Text
+          <Pressable
             style={{
-              fontFamily: FONT_FAMILY.regular,
-              fontSize: 14,
-              color: colors.layout.foreground,
-            }}>
-            Payment Method
-          </Text>
-          <View style={{gap: 6}}>
-            <AppCheckbox
-              label={{
-                checked: 'Cash on Delivery',
-                unChecked: 'Cash on Delivery',
-              }}
-              value={paymentMethod === EPaymentMethod.COD}
-              onValueChange={value => {
-                setValue(
-                  'paymentMethod',
-                  value ? EPaymentMethod.COD : EPaymentMethod.INTERNET_BANKING,
-                );
-              }}
-            />
-            <AppCheckbox
-              label={{
-                checked: 'Internet Banking',
-                unChecked: 'Internet Banking',
-              }}
-              value={paymentMethod === EPaymentMethod.INTERNET_BANKING}
-              onValueChange={value => {
-                setValue(
-                  'paymentMethod',
-                  !value ? EPaymentMethod.COD : EPaymentMethod.INTERNET_BANKING,
-                );
-              }}
-            />
+              alignSelf: 'flex-end',
+              marginBottom: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+            }}
+            onPress={() => setCollapsed(!collapsed)}>
+            <Text
+              style={{
+                fontFamily: FONT_FAMILY.regular,
+                color: colors.layout.foreground,
+              }}>
+              {collapsed ? 'Show' : 'Hide'} Order Summary
+            </Text>
+            {collapsed ? (
+              <ChevronsUp size={20} color={colors.layout.foreground} />
+            ) : (
+              <ChevronsDown size={20} color={colors.layout.foreground} />
+            )}
+          </Pressable>
+          {!collapsed && (
+            <>
+              <View style={styles.meta}>
+                <Text
+                  style={[
+                    styles.metaText,
+                    {
+                      color: colors.default.default500,
+                    },
+                  ]}>
+                  Subtotal:
+                </Text>
+                <Text
+                  style={[
+                    styles.price,
+                    {
+                      color: colors.layout.foreground,
+                    },
+                  ]}>
+                  {formatCurrency(subTotal)}
+                </Text>
+              </View>
+
+              {selectedVoucher && (
+                <View style={styles.meta}>
+                  <Text
+                    style={[
+                      styles.metaText,
+                      {
+                        color: colors.default.default500,
+                      },
+                    ]}>
+                    Applied Voucher:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.price,
+                      {
+                        color: colors.layout.foreground,
+                      },
+                    ]}>
+                    -
+                    {formatCurrency(
+                      selectedVoucher
+                        ? selectedVoucher.type === ECouponType.FIXED
+                          ? selectedVoucher.discountValue
+                          : (selectedVoucher.discountValue * subTotal) / 100
+                        : 0,
+                    )}
+                  </Text>
+                </View>
+              )}
+
+              <View style={styles.meta}>
+                <Text
+                  style={[
+                    styles.metaText,
+                    {
+                      color: colors.default.default500,
+                    },
+                  ]}>
+                  Shipping Fee:
+                </Text>
+                <Text
+                  style={[
+                    styles.price,
+                    {
+                      color: colors.layout.foreground,
+                    },
+                  ]}>
+                  {formatCurrency(fee.sf)}
+                </Text>
+              </View>
+
+              <View style={styles.meta}>
+                <Text
+                  style={[
+                    styles.metaText,
+                    {
+                      color: colors.default.default500,
+                    },
+                  ]}>
+                  Tax Fee:
+                </Text>
+                <Text
+                  style={[
+                    styles.price,
+                    {
+                      color: colors.layout.foreground,
+                    },
+                  ]}>
+                  {formatCurrency(fee.tf)}
+                </Text>
+              </View>
+            </>
+          )}
+          <View style={styles.meta}>
+            <Text
+              style={[
+                styles.metaText,
+                {
+                  color: colors.base.primary,
+                  fontSize: 20,
+                  fontFamily: FONT_FAMILY.semiBold,
+                },
+              ]}>
+              Total:
+            </Text>
+            <Text
+              style={[
+                styles.price,
+                {
+                  color: colors.base.primary,
+                  fontSize: 20,
+                  fontFamily: FONT_FAMILY.semiBold,
+                },
+              ]}>
+              {formatCurrency(total)}
+            </Text>
           </View>
-        </View>
-        <Button
-          color="primary"
-          style={{marginTop: 16}}
-          isLoading={createOrderMutation.isPending}
-          isDisabled={createOrderMutation.isPending}
-          onPress={handleSubmit(onPressCheckout)}>
-          <Text
+          <View
             style={{
-              fontFamily: FONT_FAMILY.medium,
-              color: colors.white,
+              gap: 8,
+              borderTopColor: colors.layout.divider,
+              borderTopWidth: 1,
+              marginTop: 16,
+              paddingTop: 16,
             }}>
-            Confirm Order
-          </Text>
-        </Button>
-      </View>
+            <Text
+              style={{
+                fontFamily: FONT_FAMILY.regular,
+                fontSize: 14,
+                color: colors.layout.foreground,
+              }}>
+              Payment Method
+            </Text>
+            <View style={{gap: 6}}>
+              <AppCheckbox
+                label={{
+                  checked: 'Cash on Delivery',
+                  unChecked: 'Cash on Delivery',
+                }}
+                value={paymentMethod === EPaymentMethod.COD}
+                onValueChange={value => {
+                  setValue(
+                    'paymentMethod',
+                    value
+                      ? EPaymentMethod.COD
+                      : EPaymentMethod.INTERNET_BANKING,
+                  );
+                }}
+              />
+              <AppCheckbox
+                label={{
+                  checked: 'Internet Banking',
+                  unChecked: 'Internet Banking',
+                }}
+                value={paymentMethod === EPaymentMethod.INTERNET_BANKING}
+                onValueChange={value => {
+                  setValue(
+                    'paymentMethod',
+                    !value
+                      ? EPaymentMethod.COD
+                      : EPaymentMethod.INTERNET_BANKING,
+                  );
+                }}
+              />
+            </View>
+          </View>
+          <Button
+            color="primary"
+            style={{marginTop: 16}}
+            isLoading={createOrderMutation.isPending}
+            isDisabled={createOrderMutation.isPending}
+            onPress={handleSubmit(onPressCheckout)}>
+            <Text
+              style={{
+                fontFamily: FONT_FAMILY.medium,
+                color: colors.white,
+              }}>
+              Confirm Order
+            </Text>
+          </Button>
+        </View>
+      </ScrollView>
     </View>
   );
 };

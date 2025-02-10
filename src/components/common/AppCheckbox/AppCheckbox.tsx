@@ -81,7 +81,7 @@ const AppCheckbox: React.FC<AppCheckboxProps> = (props): React.JSX.Element => {
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 16,
+        gap: 6,
       }}
       onPress={memoizeOnValueChange}>
       <View
@@ -133,6 +133,7 @@ const AppCheckbox: React.FC<AppCheckboxProps> = (props): React.JSX.Element => {
           style={{
             color: colors.layout.foreground,
             ...TYPOGRAPHY.body2,
+            marginTop: 4,
           }}>
           {value ? label?.checked : label?.unChecked || label?.checked}
         </Text>

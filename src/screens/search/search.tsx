@@ -19,9 +19,10 @@ import {
 } from '@gorhom/bottom-sheet';
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {Filter, Star} from 'lucide-react-native';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
+  BackHandler,
   FlatList,
   Pressable,
   StatusBar,
@@ -94,14 +95,6 @@ const SearchScreen = () => {
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  console.log(
-    selectedCategories,
-    selectedPrice,
-    selectedColors,
-    selectedSizes,
-    selectedStars,
-  );
-
   const onApplyFilter = () => {
     setQueries({
       isOnSale,
@@ -113,6 +106,18 @@ const SearchScreen = () => {
     });
     bottomSheetModalRef.current?.close();
   };
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        bottomSheetModalRef.current?.close();
+        return true;
+      },
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <BottomSheetModalProvider>
@@ -203,9 +208,15 @@ const SearchScreen = () => {
         <BottomSheetScrollView contentContainerStyle={{padding: 20, gap: 20}}>
           <View
             style={{
-              gap: 8,
+              gap: 16,
             }}>
-            <Text>Categories</Text>
+            <Text
+              style={{
+                ...TYPOGRAPHY.h6,
+                color: colors.layout.foreground,
+              }}>
+              Categories
+            </Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -214,30 +225,25 @@ const SearchScreen = () => {
                 alignItems: 'center',
               }}>
               {categoryData?.data?.map(category => (
-                <View
+                <AppCheckbox
                   key={category._id}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 8,
-                  }}>
-                  <AppCheckbox
-                    value={selectedCategories.includes(category._id!)}
-                    onValueChange={v => {
-                      if (v) {
-                        setSelectedCategories(prev => [...prev, category._id!]);
-                      } else {
-                        setSelectedCategories(
-                          selectedCategories.filter(
-                            selectedCategory =>
-                              selectedCategory !== category._id,
-                          ),
-                        );
-                      }
-                    }}
-                  />
-                  <Text>{category.name}</Text>
-                </View>
+                  value={selectedCategories.includes(category._id!)}
+                  onValueChange={v => {
+                    if (v) {
+                      setSelectedCategories(prev => [...prev, category._id!]);
+                    } else {
+                      setSelectedCategories(
+                        selectedCategories.filter(
+                          selectedCategory => selectedCategory !== category._id,
+                        ),
+                      );
+                    }
+                  }}
+                  label={{
+                    checked: category.name,
+                    unChecked: category.name,
+                  }}
+                />
               ))}
             </View>
           </View>
@@ -245,7 +251,13 @@ const SearchScreen = () => {
             style={{
               gap: 8,
             }}>
-            <Text>Price $</Text>
+            <Text
+              style={{
+                ...TYPOGRAPHY.h6,
+                color: colors.layout.foreground,
+              }}>
+              Price $
+            </Text>
             <Slider
               style={{}}
               min={0}
@@ -255,20 +267,26 @@ const SearchScreen = () => {
               onChange={(values: any) => setSelectedPrice(values)}
             />
           </View>
+
+          <AppCheckbox
+            value={isOnSale}
+            onValueChange={setIsOnSale}
+            label={{
+              checked: 'On sale',
+              unChecked: 'On sale',
+            }}
+          />
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
               gap: 8,
             }}>
-            <AppCheckbox value={isOnSale} onValueChange={setIsOnSale} />
-            <Text>Is on sale</Text>
-          </View>
-          <View
-            style={{
-              gap: 8,
-            }}>
-            <Text>Colors</Text>
+            <Text
+              style={{
+                ...TYPOGRAPHY.h6,
+                color: colors.layout.foreground,
+              }}>
+              Colors
+            </Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -314,7 +332,13 @@ const SearchScreen = () => {
               style={{
                 gap: 8,
               }}>
-              <Text>Sizes</Text>
+              <Text
+                style={{
+                  ...TYPOGRAPHY.h6,
+                  color: colors.layout.foreground,
+                }}>
+                Sizes
+              </Text>
               <View
                 style={{
                   flexDirection: 'row',
@@ -323,29 +347,25 @@ const SearchScreen = () => {
                   alignItems: 'center',
                 }}>
                 {sizes.map(size => (
-                  <View
+                  <AppCheckbox
                     key={size}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 8,
-                    }}>
-                    <AppCheckbox
-                      value={selectedSizes.includes(size)}
-                      onValueChange={v => {
-                        if (v) {
-                          setSelectedSizes(prev => [...prev, size]);
-                        } else {
-                          setSelectedSizes(
-                            selectedSizes.filter(
-                              selectedSize => selectedSize !== size,
-                            ),
-                          );
-                        }
-                      }}
-                    />
-                    <Text>{size}</Text>
-                  </View>
+                    value={selectedSizes.includes(size)}
+                    onValueChange={v => {
+                      if (v) {
+                        setSelectedSizes(prev => [...prev, size]);
+                      } else {
+                        setSelectedSizes(
+                          selectedSizes.filter(
+                            selectedSize => selectedSize !== size,
+                          ),
+                        );
+                      }
+                    }}
+                    label={{
+                      checked: size,
+                      unChecked: size,
+                    }}
+                  />
                 ))}
               </View>
             </View>
@@ -353,7 +373,13 @@ const SearchScreen = () => {
               style={{
                 gap: 8,
               }}>
-              <Text>Ratings</Text>
+              <Text
+                style={{
+                  ...TYPOGRAPHY.h6,
+                  color: colors.layout.foreground,
+                }}>
+                Ratings
+              </Text>
               <View
                 style={{
                   flexDirection: 'row',
@@ -382,8 +408,11 @@ const SearchScreen = () => {
                           );
                         }
                       }}
+                      label={{
+                        checked: `${star}`,
+                        unChecked: `${star}`,
+                      }}
                     />
-                    <Text>{star}</Text>
                     <Star
                       size={16}
                       stroke={colors.warning.warning400}
@@ -399,7 +428,8 @@ const SearchScreen = () => {
                 gap: 12,
                 borderTopColor: colors.layout.divider,
                 borderTopWidth: 1,
-                paddingTop: 12,
+                paddingTop: 20,
+                marginTop: 12,
               }}>
               <Button
                 color="primary"

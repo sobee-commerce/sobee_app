@@ -1,6 +1,7 @@
 export const API_ROUTES = {
   AUTH: {
     LOGIN: '/auth/login',
+    GOOGLE_LOGIN: '/auth/google-login',
     REGISTER: '/auth/register',
     REFRESH_TOKEN: '/auth/refresh-token',
     LOGOUT: '/auth/logout',
@@ -112,5 +113,8 @@ export const API_ROUTES = {
   CHAT: {
     CREATE_ROOM: '/chat-room',
     GET_ROOM: '/chat-room/:id',
+  },
+  NOTIFICATION: {
+    SAVE_TOKEN: '/notification/save-token',
   },
 };

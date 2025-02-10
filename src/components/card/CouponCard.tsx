@@ -13,8 +13,14 @@ import {Image, Pressable, Text, View} from 'react-native';
 
 type CouponCardProps = {
   coupon: ICoupon;
+  onPress?: () => void;
+  isSelected?: boolean;
 };
-const CouponCard = ({coupon}: CouponCardProps) => {
+const CouponCard = ({
+  coupon,
+  onPress: _onPress,
+  isSelected = false,
+}: CouponCardProps) => {
   const navigation = useNavigation<ApplicationNavigationProps>();
   const {colors} = useTheme();
   const {user} = useAuthContext();
@@ -39,6 +45,10 @@ const CouponCard = ({coupon}: CouponCardProps) => {
   };
 
   const onPress = () => {
+    if (_onPress) {
+      _onPress();
+      return;
+    }
     navigation.navigate('CouponDetail', {couponCode: coupon.code!});
   };
 
@@ -48,12 +58,12 @@ const CouponCard = ({coupon}: CouponCardProps) => {
 
   return (
     <Pressable
-      disabled={isExpired}
+      // disabled={isExpired}
       onPress={onPress}
       style={{
         flexDirection: 'row',
-        borderWidth: 0.5,
-        borderColor: colors.layout.divider,
+        borderWidth: isSelected ? 2 : 0.5,
+        borderColor: isSelected ? colors.base.primary : colors.layout.divider,
         gap: 8,
         borderRadius: 8,
         overflow: 'hidden',

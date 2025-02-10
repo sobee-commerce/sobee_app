@@ -10,10 +10,10 @@ export const APP_CONFIG = {
     USER_ID: `${APP_NAME}:userId`,
   },
   API_URL: __DEV__
-    ? 'http://10.0.2.2:8000/api'
+    ? 'https://2fb1-2402-800-6379-39b0-5cd3-865e-29db-c16c.ngrok-free.app/api'
     : 'https://sobee-be.up.railway.app/api',
   BASE_SOCKET_URL: __DEV__
-    ? 'http://10.0.2.2:8000'
+    ? 'https://2fb1-2402-800-6379-39b0-5cd3-865e-29db-c16c.ngrok-free.app'
     : 'https://sobee-be.up.railway.app',
   SCREEN: {
     WIDTH: Dimensions.get('screen').width,

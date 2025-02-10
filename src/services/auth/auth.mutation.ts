@@ -16,6 +16,15 @@ export const useLoginMutation = () => {
   });
 };
 
+export const useGoogleLoginMutation = () => {
+  return useMutation({
+    mutationFn: async (email: string) => {
+      const res = await authService.googleLogin(email);
+      return res.data;
+    },
+  });
+};
+
 export const useRegisterMutation = () => {
   return useMutation({
     mutationFn: async (data: RegisterFormSchema) => {

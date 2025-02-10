@@ -11,6 +11,8 @@ import {AuthResponse, GetMeResponse} from './auth.dto';
 export const authService = {
   login: async (data: LoginFormSchema) =>
     await apiClient.post<AuthResponse>(API_ROUTES.AUTH.LOGIN, data),
+  googleLogin: async (email: string) =>
+    await apiClient.post<AuthResponse>(API_ROUTES.AUTH.GOOGLE_LOGIN, {email}),
   register: async (data: RegisterFormSchema) =>
     await apiClient.post<AuthResponse>(API_ROUTES.AUTH.REGISTER, data),
   getMe: async () => await apiClient.get<GetMeResponse>(API_ROUTES.AUTH.GET_ME),

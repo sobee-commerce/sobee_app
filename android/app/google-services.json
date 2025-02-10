@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "875181324783",
+    "project_id": "sobee-6aa79",
+    "storage_bucket": "sobee-6aa79.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875181324783:android:d680a5cc9df575925d5e1a",
+        "android_client_info": {
+          "package_name": "com.sobee_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "875181324783-c1bskdd3hdrtab9bhld7seup2qvqajao.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sobee_app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "875181324783-v3tevbvceqcbaht8me5283gb387rg4sh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-0ZmeVbXJEAlSEjvdCpUyWS7-E0tAfKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "875181324783-v3tevbvceqcbaht8me5283gb387rg4sh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -17,6 +17,7 @@ import {
   ToastAndroid,
   View,
 } from 'react-native';
+import SocialAuthentication from '../components/SocialAuthentication';
 
 const LoginScreen = ({navigation}: ApplicationScreenProps<'Login'>) => {
   const {colors} = useTheme();
@@ -180,6 +181,8 @@ const LoginScreen = ({navigation}: ApplicationScreenProps<'Login'>) => {
               </Text>
             </Pressable>
           </View>
+          <Text style={TYPOGRAPHY.body2}>or</Text>
+          <SocialAuthentication />
         </View>
       </ScrollView>
       <StatusBar backgroundColor={'transparent'} />

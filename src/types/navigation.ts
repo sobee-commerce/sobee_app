@@ -1,4 +1,4 @@
-import {IAddress, IQuestion, IReview} from '@/lib/interfaces';
+import {IAddress, ICoupon, IQuestion, IReview} from '@/lib/interfaces';
 import {NavigationProp} from '@react-navigation/native';
 import type {StackScreenProps} from '@react-navigation/stack';
 
@@ -48,6 +48,10 @@ export type ApplicationStackParamList = {
   ForgotPassword: undefined;
   SavedCoupon: undefined;
   ValidateOtp: {email: string};
+  SelectVoucher: {
+    onSelect: (voucher: ICoupon) => void;
+    selectedVoucher: ICoupon | null;
+  };
 };
 
 /**

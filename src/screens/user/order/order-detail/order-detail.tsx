@@ -223,6 +223,7 @@ const OrderDetailScreen = ({
             {formatCurrency(subTotal)}
           </Text>
         </View>
+
         <View style={styles.meta}>
           <Text
             style={[

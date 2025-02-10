@@ -1,7 +1,4 @@
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-
-import {CameraProvider, useTheme} from '@/context';
+import {CameraProvider, useAuthContext, useTheme} from '@/context';
 import {
   AddressDetailScreen,
   AddressScreen,
@@ -32,12 +29,18 @@ import {
 } from '@/screens';
 import ForgotPassword from '@/screens/auth/forgot-password';
 import ValidateOtp from '@/screens/auth/validate-otp';
+import Voucher from '@/screens/checkout/voucher';
 import SettingsScreen from '@/screens/settings/settings';
 import ChangePassword from '@/screens/user/profile/change-password';
 import EditProfile from '@/screens/user/profile/edit-profile';
 import SavedCoupons from '@/screens/user/profile/saved-coupons';
+import {useSaveFCMTokenMutation} from '@/services/notification/notification.mutation';
 import type {ApplicationStackParamList} from '@/types/navigation';
 import {APP_CONFIG, FONT_FAMILY, navigationRef} from '@/utils';
+import messaging from '@react-native-firebase/messaging';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {useEffect} from 'react';
 import {StatusBar} from 'react-native';
 
 const Stack = createStackNavigator<ApplicationStackParamList>();
@@ -45,6 +48,25 @@ const Stack = createStackNavigator<ApplicationStackParamList>();
 function ApplicationNavigator() {
   const initialRouteName: keyof ApplicationStackParamList = 'Splash';
   const {colors, theme} = useTheme();
+  const saveTokenMutation = useSaveFCMTokenMutation();
+  const {isAuthenticated} = useAuthContext();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const saveToken = (token: string) => {
+      saveTokenMutation.mutate(token);
+    };
+
+    messaging()
+      .getToken()
+      .then(token => {
+        saveToken(token);
+      });
+
+    return messaging().onTokenRefresh(token => {
+      saveToken(token);
+    });
+  }, [isAuthenticated]);
 
   const QRScanner = (props: any) => {
     return (
@@ -185,6 +207,13 @@ function ApplicationNavigator() {
             component={SavedCoupons}
             options={{
               title: 'Saved Coupons',
+            }}
+          />
+          <Stack.Screen
+            name="SelectVoucher"
+            component={Voucher}
+            options={{
+              title: 'Select Voucher',
             }}
           />
         </Stack.Navigator>
