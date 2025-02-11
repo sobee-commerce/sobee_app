@@ -19,7 +19,7 @@ export const useGetOrderByIdQuery = (id: string) => {
       const res = await orderService.getOrderById(id);
       return res.data;
     },
-    refetchInterval: 30000,
+    refetchInterval: 5000,
   });
 };
 

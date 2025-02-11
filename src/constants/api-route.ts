@@ -1,7 +1,7 @@
 export const API_ROUTES = {
   AUTH: {
     LOGIN: '/auth/login',
-    GOOGLE_LOGIN: '/auth/google-login',
+    GOOGLE_LOGIN: '/auth/login/google',
     REGISTER: '/auth/register',
     REFRESH_TOKEN: '/auth/refresh-token',
     LOGOUT: '/auth/logout',
@@ -106,6 +106,7 @@ export const API_ROUTES = {
     CANCEL_ORDER: '/order/:id/status/cancel',
     GET_ORDER_ITEMS: '/order/item',
     PAY: '/order/payment-sheet',
+    RECEIVE_ORDER: '/order/:id/status/receive',
   },
   PAYMENT_METHODS: {
     GET_PAYMENT_METHODS: '/payment-method',

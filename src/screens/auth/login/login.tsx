@@ -181,7 +181,15 @@ const LoginScreen = ({navigation}: ApplicationScreenProps<'Login'>) => {
               </Text>
             </Pressable>
           </View>
-          <Text style={TYPOGRAPHY.body2}>or</Text>
+          <Text
+            style={[
+              TYPOGRAPHY.body2,
+              {
+                textAlign: 'center',
+              },
+            ]}>
+            or
+          </Text>
           <SocialAuthentication />
         </View>
       </ScrollView>

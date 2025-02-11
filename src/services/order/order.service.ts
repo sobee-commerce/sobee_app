@@ -23,6 +23,8 @@ export const orderService = {
       API_ROUTES.ORDER.ADD_ORDER_ITEM,
       data,
     ),
+  receiveOrder: async (id: string) =>
+    await apiClient.put(API_ROUTES.ORDER.RECEIVE_ORDER.replace(':id', id)),
   updateOrderItemQuantity: async (id: string, quantity: number) =>
     await apiClient.put<BaseResponse<IOrderItem>>(
       API_ROUTES.ORDER.UPDATE_ORDER_ITEM_QUANTITY.replace(':id', id),

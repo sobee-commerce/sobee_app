@@ -42,6 +42,21 @@ export const useCreateOrderItemMutation = () => {
   });
 };
 
+export const useReceiveOrderMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await orderService.receiveOrder(id);
+      if (res.data.success) {
+        await queryClient.refetchQueries({
+          queryKey: [QUERY_KEY.ORDER.GET_BY_ID, id],
+        });
+      }
+      return res.data;
+    },
+  });
+};
+
 export const useRemoveOrderItemMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -68,6 +83,9 @@ export const useUpdateOrderItemQuantityMutation = () => {
       if (res.data.success) {
         await queryClient.refetchQueries({
           queryKey: [QUERY_KEY.ORDER.GET_ITEMS],
+        });
+        await queryClient.refetchQueries({
+          queryKey: [QUERY_KEY.ORDER.GET_BY_ID, data._id],
         });
       }
       return res.data;

@@ -33,7 +33,7 @@ const App = () => {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        '875181324783-c1bskdd3hdrtab9bhld7seup2qvqajao.apps.googleusercontent.com',
+        '875181324783-v3tevbvceqcbaht8me5283gb387rg4sh.apps.googleusercontent.com',
     });
   }, []);
 
@@ -75,13 +75,6 @@ const App = () => {
   }
 
   useEffect(() => {
-    onDisplayNotification({
-      notification: {
-        title: 'Welcome back',
-        body: "It's great to see you again",
-      },
-      data: {},
-    });
     (async () => {
       const {status: checkStatus} = await checkNotifications();
 

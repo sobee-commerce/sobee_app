@@ -9,6 +9,7 @@ import {
   chatService,
   useCancelOrderMutation,
   useGetOrderByIdQuery,
+  useReceiveOrderMutation,
 } from '@/services';
 import {FONT_FAMILY} from '@/theme';
 import {ApplicationScreenProps} from '@/types';
@@ -34,6 +35,7 @@ const OrderDetailScreen = ({
   const cancelOrderMutation = useCancelOrderMutation();
   const {createRoom, isLoading, isError, isSuccess, data, error} =
     useCreateChatRoomSocket();
+  const receiveOrderMutation = useReceiveOrderMutation();
 
   const onPressCancel = () => {
     Alert.alert('Cancel Order', 'Are you sure you want to cancel this order?', [
@@ -100,8 +102,15 @@ const OrderDetailScreen = ({
   const onReceiveOrder = () => {
     navigation.navigate('ScanQRCode', {
       onSuccess: (value: string) => {
-        console.log(value);
         // TODO: Call API to update order status
+        receiveOrderMutation.mutate(value, {
+          onSuccess: () => {
+            Alert.alert('Success', 'Order received successfully');
+          },
+          onError: (err: any) => {
+            Alert.alert('Error', err?.response?.data?.message || err.message);
+          },
+        });
       },
     });
   };
@@ -158,7 +167,7 @@ const OrderDetailScreen = ({
         style={{flex: 1}}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{gap: 12, padding: 20}}>
-        {getOrderQuery.isRefetching && <ActivityIndicator />}
+        {/* {getOrderQuery.isRefetching && <ActivityIndicator />} */}
         <Text
           style={{
             fontSize: 20,

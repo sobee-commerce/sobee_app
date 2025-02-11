@@ -1,6 +1,6 @@
 import {useAuthContext, useTheme} from '@/context';
 import {formatCurrency} from '@/lib';
-import {ECouponStatus} from '@/lib/enum';
+import {ECouponStatus, ECouponType} from '@/lib/enum';
 import {ICoupon} from '@/lib/interfaces';
 import {useSaveCouponMutation} from '@/services';
 import {FONT_FAMILY, TYPOGRAPHY} from '@/theme';
@@ -111,7 +111,7 @@ const CouponCard = ({
             },
           ]}
           numberOfLines={1}>
-          {coupon.type === 'Percentage'
+          {coupon.type === ECouponType.PERCENTAGE
             ? `${coupon.discountValue * 100}% OFF`
             : `${formatCurrency(coupon.discountValue)} OFF`}
         </Text>

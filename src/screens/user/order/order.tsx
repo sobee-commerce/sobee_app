@@ -27,6 +27,7 @@ const OrderScreen = ({navigation, route}: ApplicationScreenProps<'Order'>) => {
       getNextPageParam: (lastPage, allPages) => {
         return lastPage.hasNext ? allPages.length + 1 : undefined;
       },
+      gcTime: 0,
     });
 
   const statuses = ['ALL', ...Object.values(EOrderStatus)];
